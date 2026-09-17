@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+{{head}}
+<title>{{title}}</title>
+</head>
+<body>
+<h1>{{title}}</h1>
+<p class="muted">{{date}} · repository <code>{{repo}}</code> · roast: {{roast_link_or_none}}</p>
+<p class="rule">Code samples in this plan are HTML-escaped. When you transcribe them, decode entities: <code>&amp;lt;</code> is <code>&lt;</code>, <code>&amp;gt;</code> is <code>&gt;</code>, <code>&amp;amp;</code> is <code>&amp;</code>.</p>
+
+<h2>Goal</h2>
+<p>{{goal: 2 to 4 sentences, what changes for the user and why}}</p>
+
+<h2>Context</h2>
+<ul>
+<li><code>{{path}}</code> — {{one-line role}}</li>
+</ul>
+
+<h2>Decisions</h2>
+<ul>
+<li>{{locked decision}}</li>
+</ul>
+
+<h2>Constants</h2>
+<table>
+<tr><th>Key</th><th>Value</th></tr>
+<tr><td><code>{{KEY}}</code></td><td>{{value}}</td></tr>
+</table>
+
+<h2>Steps</h2>
+<ol>
+<li>
+<h3>☐ {{step title}}</h3>
+<p><strong>Files:</strong> <code>{{path}}</code></p>
+<p><strong>Test first:</strong> <code>{{test path}}</code> — {{what it asserts}}. Run: <code>{{test command}}</code></p>
+<p><strong>Do:</strong> {{exact implementation instructions}}</p>
+<pre><code>{{escaped code sample, if any}}</code></pre>
+<p><strong>Gate:</strong> <code>{{gate command}}</code></p>
+<p><strong>Acceptance:</strong> {{command and expected result, or observable behaviour}}</p>
+</li>
+</ol>
+
+<h2>Verification</h2>
+<ul>
+<li>{{end-to-end check command and expected result}}</li>
+<li>USER TASK: {{manual check the human performs}}</li>
+</ul>
+
+<h2>Out of scope</h2>
+<ul>
+<li>{{what must not be done or touched}}</li>
+</ul>
+
+<h2>Rules for the implementing agent</h2>
+<ul>
+<li>Run the <code>execute-plan</code> skill on this file.</li>
+<li>Follow the steps in order. Write the test first for every behaviour change.</li>
+<li>The gate must pass before every commit. Never weaken or skip tests to get it green.</li>
+<li>Stage explicit paths only. Never stage anything under <code>plan/</code>.</li>
+<li>Never push, never publish.</li>
+<li>If reality contradicts this plan, stop and report instead of improvising.</li>
+<li>Never perform or self-certify a USER TASK.</li>
+</ul>
+</body>
+</html>
