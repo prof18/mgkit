@@ -1,0 +1,26 @@
+{
+  "name": "mgkit",
+  "version": "0.0.1",
+  "description": "An opinionated toolkit for building software with AI agents: roast, plan, execute, review, ship.",
+  "license": "MIT",
+  "author": {
+    "name": "Marco Gomiero"
+  },
+  "type": "module",
+  "private": true,
+  "keywords": [
+    "skills",
+    "planning",
+    "code-review",
+    "tdd",
+    "workflow",
+    "agents",
+    "pi-package"
+  ],
+  "main": ".opencode/plugins/mgkit.js",
+  "pi": {
+    "skills": [
+      "./skills"
+    ]
+  }
+}
