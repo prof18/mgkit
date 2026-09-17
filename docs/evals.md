@@ -53,4 +53,4 @@ Final scores after two wording iterations. `WITH` is with mgkit loaded, `W/OUT` 
 
 Findings from run 1: `plan`, `plan-max`, `execute-plan` and `build` answered from their descriptions without loading the skill; the descriptions now name their trigger phrases explicitly. `plan-max-suggests-plan` shows no delta because the model already refuses a multi-file plan for a typo without help.
 
-Cost: run 1 (all cases) $1.13, run 2 (five cases) $1.18444340000000004, run 3 (three cases) $.9283556.
+Cost: run 1 (all cases) $1.13, run 2 (five cases) $1.18, run 3 (three cases) $0.93.
