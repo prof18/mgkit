@@ -123,7 +123,7 @@ None (`opencode --help` has no goal mode). `execute-plan` loops through `TODO.md
 
 ### Isolated check used by mgkit maintainers
 
-`OPENCODE_CONFIG_DIR=$(mktemp -d)` with an `opencode.json` containing the `file://` spec, plus `OPENCODE_DISABLE_EXTERNAL_SKILLS=1` so skills under `~/.claude` and `~/.agents` don't mix in; run `opencode debug skill` from a temp directory and check the JSON array (`jq -r '.[].name'`) lists every skill. No login needed. The global `~/.config/opencode/opencode.json` is not touched.
+`OPENCODE_CONFIG_DIR=$(mktemp -d)` with an `opencode.json` containing the `file://` spec, plus `OPENCODE_DISABLE_EXTERNAL_SKILLS=1` so skills under `~/.claude` and `~/.agents` don't mix in; run `opencode debug skill` from a temp directory with its output redirected to a file (piped output is cut off at about 64 KB, which the full skill set exceeds) and check the JSON array (`jq -r '.[].name' file`) lists every skill. No login needed. The global `~/.config/opencode/opencode.json` is not touched.
 
 ## Pi
 
