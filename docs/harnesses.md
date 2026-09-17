@@ -87,7 +87,7 @@ Set `CODEX_HOME=$(mktemp -d)` for every command: `codex plugin marketplace add <
 
 ## OpenCode
 
-Wrapper: `.opencode/plugins/mgkit.js`, referenced by `"main"` in `package.json`. Its `config` hook appends the absolute path of `skills/` to `config.skills.paths` (a documented config key: `skills.paths` is scanned recursively for `**/SKILL.md`).
+Wrapper: `.opencode/plugins/mgkit.js`, referenced by `"main"` in `package.json`. OpenCode treats every export of a plugin module as a plugin: a module that also exported a helper function and a string loaded no skills at all, so the file exports only `MgkitPlugin`. Its `config` hook appends the absolute path of `skills/` to `config.skills.paths` (a documented config key: `skills.paths` is scanned recursively for `**/SKILL.md`).
 
 ### Install (from GitHub, for users)
 
