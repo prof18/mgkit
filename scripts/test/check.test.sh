@@ -135,4 +135,22 @@ test_empty_version_fields_override() {
   assert_contains "skip C3"
 }
 
+test_broken_relative_skill_path() {
+  local root; root="$(new_fixture)"
+  printf '\nRead `../missing/SKILL.md` and follow it.\n' >> "$root/skills/sample/SKILL.md"
+  run_capture "$CHECK" "$root"
+  assert_status 1
+  assert_contains "FAIL C12"
+}
+
+test_valid_relative_skill_path() {
+  local root; root="$(new_fixture)"
+  mkdir -p "$root/skills/sample/references"
+  printf 'x\n' > "$root/skills/sample/references/x.md"
+  printf '\nRead `../sample/references/x.md`.\n' >> "$root/skills/sample/SKILL.md"
+  run_capture "$CHECK" "$root"
+  assert_status 0
+  assert_contains "ok   C12"
+}
+
 run_tests

@@ -145,6 +145,20 @@ done
 [ "$c6" -eq 0 ] && ok C6
 [ "$c7" -eq 0 ] && ok C7
 
+# C12 relative references between skills resolve
+c12=0
+if [ -d "$ROOT/skills" ]; then
+  for skill in "$ROOT"/skills/*/SKILL.md; do
+    [ -f "$skill" ] || continue
+    dir="$(dirname "$skill")"; name="$(basename "$dir")"
+    while IFS= read -r ref; do
+      [ -n "$ref" ] || continue
+      if [ ! -e "$dir/$ref" ]; then fail C12 "broken skill reference $ref in $name"; c12=1; fi
+    done < <(grep -oE '\.\./[a-z0-9-]+/[A-Za-z0-9_./-]+\.(md|html)' "$skill" | sort -u)
+  done
+fi
+[ "$c12" -eq 0 ] && ok C12
+
 # C8 OpenCode plugin syntax
 if [ -f "$ROOT/.opencode/plugins/mgkit.js" ]; then
   # node --check misses syntax errors in .js files outside a "type": "module" package, so import the module instead.
