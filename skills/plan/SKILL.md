@@ -30,6 +30,8 @@ If the request does not fit, say that `plan-max` fits better and why, and ask wh
    ➡️ <recommended answer and one-sentence reason>
    ```
 
+   Every question uses this format, including practical ones such as where the code lives or which project is meant.
+
    Skip this when a roast file already settles everything. Wait for the answers.
 4. **Write** the plan (below).
 5. **Self-check.** Read `references/cheap-agent-bar.md` from this skill's directory and make the plan satisfy every item. Fix gaps before presenting.

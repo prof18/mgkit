@@ -30,9 +30,9 @@ Results are written to `evals/results/<timestamp>/` (gitignored).
 | Case | Checks |
 |---|---|
 | `roast-critique-then-round` | roast fires; critique names existing tools before questions; `❓ **Q1` / `➡️` format; no file writes |
-| `roast-name-hunt` | roast fires; candidate table with conflicts and domains, recommendation, choice left to the user; no file writes |
+| `roast-name-hunt` | roast fires; name table with conflicts and domain columns (regex); the name is asked as a round question (regex); no file writes |
 | `plan-questions-first` | plan fires; asks questions in the round format; no file writes |
-| `plan-max-suggests-plan` | plan-max fires; recommends `plan` for a tiny task and asks before switching; no file writes |
+| `plan-max-suggests-plan` | plan-max fires; says the task is too small, points to `plan` or a direct fix, asks how to proceed; no file writes |
 | `execute-plan-no-plan` | execute-plan fires; reports no plan found and where plans are expected; no file writes |
 | `build-stops-at-checkpoint` | build fires; stops for an explicit go before implementing; no `git commit` |
 

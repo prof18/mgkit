@@ -23,6 +23,8 @@ Read the size rule in `../plan/SKILL.md` (relative to this skill's directory; if
    ➡️ <recommended answer and one-sentence reason>
    ```
 
+   Every question uses this format, including practical ones such as where the code lives or which project is meant.
+
    Always include the proposed milestone breakdown (one line per milestone) as a question, and get agreement on it. Skip other questions only when a roast file already settles them. Wait for the answers.
 4. **Write** the plan folder (below).
 5. **Self-check.** Read `../plan/references/cheap-agent-bar.md` and make every file satisfy every item. Also check across files: ids in milestone files match `TODO.md`, constants are defined once in `00-conventions.html`, links between files work, and no task uses something a later task creates.
