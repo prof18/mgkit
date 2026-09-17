@@ -1,0 +1,4 @@
+interface:
+  display_name: "Review and Fix"
+  short_description: "Run a graded, budget-conscious review-fix-verify pass across a codebase."
+  default_prompt: "Use $review-and-fix to run one review pass with 1-3 fresh-context reviewer agents, verify and grade findings in the main agent, discard low-confidence and low-importance findings, fix confirmed medium-or-higher issues with a single worker, preserve the starting commit posture, and report the findings funnel and verification."
