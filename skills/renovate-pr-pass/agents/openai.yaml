@@ -1,0 +1,4 @@
+interface:
+  display_name: "Renovate PR Pass"
+  short_description: "Merge green Renovate PRs, even when stale after earlier merges"
+  default_prompt: "Use $renovate-pr-pass to review open Renovate PRs, merge the green ones even if they became stale after earlier merges moved main, and trigger rebases for the blocked ones."
