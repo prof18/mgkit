@@ -1,0 +1,31 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "mgkit",
+  "version": "0.0.1",
+  "description": "An opinionated toolkit for building software with AI agents: roast, plan, execute, review, ship.",
+  "author": {
+    "name": "Marco Gomiero"
+  },
+  "license": "MIT",
+  "keywords": [
+    "skills",
+    "planning",
+    "code-review",
+    "tdd",
+    "workflow",
+    "agents"
+  ],
+  "extensions": {
+    "com.openai": {
+      "displayName": "mgkit",
+      "shortDescription": "Roast, plan, execute, review, ship",
+      "longDescription": "An opinionated toolkit for building software with AI agents. Roast the idea, plan it so a cheap agent can build it, execute, review, ship.",
+      "category": "Developer Tools",
+      "capabilities": [
+        "Interactive",
+        "Read",
+        "Write"
+      ]
+    }
+  }
+}

@@ -71,7 +71,7 @@ codex plugin marketplace add /path/to/mgkit
 codex plugin add mgkit@mgkit
 ```
 
-A local marketplace is recorded in `config.toml` with `source_type = "local"`; `codex plugin marketplace upgrade` refreshes Git marketplaces.
+A local marketplace is recorded in `config.toml` with `source_type = "local"`; `codex plugin marketplace upgrade` refreshes Git marketplaces. A local install copies the whole working tree into the plugin cache, untracked files included; reinstall (`codex plugin remove mgkit@mgkit` then `codex plugin add mgkit@mgkit`) to pick up changes.
 
 ### Invoke a skill
 
