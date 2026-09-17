@@ -15,6 +15,7 @@ All notable changes to mgkit. Versions stay 0.0.x until the toolkit is declared 
 - `plan-max`: write a multi-file plan (index, milestone files, TODO.md) for big features, with kickoff lines per harness.
 - `plan-review`: one-pass review of a small or big plan that fixes findings in place and reports.
 - `execute-plan`: implement a small plan in one run or a big plan task by task from TODO.md, with test-first changes, gate, review and explicit staging.
+- `build`: run plan, plan-review, execute-plan and review-and-fix end to end, stopping for the user to check the plan and the code.
 - `renovate-pr-pass`: Merge green Renovate PRs and trigger rebases for blocked ones.
 
 ### Changed
