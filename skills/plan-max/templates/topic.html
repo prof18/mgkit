@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+{{head}}
+<title>{{plan title}}: M{{n}} {{milestone title}}</title>
+</head>
+<body>
+<h1>M{{n}} — {{milestone title}}</h1>
+<p class="muted"><a href="INDEX.html">← INDEX</a> · decode HTML entities in code samples</p>
+
+<h2>Goal</h2>
+<p>{{what this milestone delivers and why it comes at this point}}</p>
+
+<h2>Design</h2>
+<p>{{details, decisions, data shapes, file layout, with sources for external facts}}</p>
+
+<h2>Tasks</h2>
+<h3 id="T{{n}}.{{k}}">T{{n}}.{{k}} — {{task title}}</h3>
+<p><strong>Files:</strong> <code>{{path}}</code></p>
+<p><strong>Test first:</strong> <code>{{test path}}</code> — {{what it asserts}}. Run: <code>{{test command}}</code></p>
+<p><strong>Do:</strong> {{exact instructions}}</p>
+<pre><code>{{escaped code sample, if any}}</code></pre>
+<p><strong>Acceptance:</strong> {{command and expected result, or observable behaviour}}</p>
+
+<h2>Milestone acceptance</h2>
+<ul>
+<li>{{check}}</li>
+</ul>
+</body>
+</html>

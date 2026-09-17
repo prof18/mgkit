@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+{{head}}
+<title>{{plan title}}</title>
+</head>
+<body>
+<h1>{{plan title}}</h1>
+<p class="muted">Plan <code>{{folder name}}</code> · repository <code>{{repo}}</code> · roast: {{roast_link_or_none}}</p>
+
+<p>{{one-paragraph summary of what will be built and why}}</p>
+
+<h2>How to work this plan</h2>
+<div class="rule">
+<ol>
+<li>Read this file fully, then <a href="00-conventions.html">00-conventions.html</a> fully. Its working protocol and constants are binding.</li>
+<li><code>TODO.md</code> in this folder is the single source of truth for progress. Trust it over any memory of earlier sessions.</li>
+<li>Take the first unchecked task that is not a USER TASK and not waiting on a blocked task. Read the milestone file it belongs to (the whole file the first time you enter a milestone). Do the task.</li>
+<li>Tick a task only when it is done, the gate is green, and the change is committed.</li>
+<li>Work top to bottom. Do not start a milestone before the previous milestone's acceptance checks pass.</li>
+<li>Never modify files in this folder except <code>TODO.md</code>. Never commit anything in this folder.</li>
+<li>If reality contradicts the plan, do not improvise: write <code>BLOCKED: &lt;reason and evidence&gt;</code> indented under the task in <code>TODO.md</code>, and continue with the next task that does not depend on it.</li>
+</ol>
+</div>
+
+<h2>Milestones</h2>
+<table>
+<tr><th>#</th><th>File</th><th>Outcome</th></tr>
+<tr><td>—</td><td><a href="00-conventions.html">00-conventions</a></td><td>Working protocol, gate, constants. Read first.</td></tr>
+<tr><td>M{{n}}</td><td><a href="{{NN-topic}}.html">{{NN-topic}}</a></td><td>{{outcome}}</td></tr>
+</table>
+
+<h2>Target layout</h2>
+<pre><code>{{tree of files and folders created or changed, escaped}}</code></pre>
+
+<h2>Out of scope</h2>
+<ul>
+<li>{{what must not be done or touched}}</li>
+</ul>
+</body>
+</html>

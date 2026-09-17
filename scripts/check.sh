@@ -7,7 +7,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="${1:-$(git rev-parse --show-toplevel)}"
 ROOT="$(cd "$ROOT" && pwd)"
 
-EXPECTED_SKILLS=(review-and-fix explain-commit worktree-task renovate-update-loop renovate-pr-pass roast plan)
+EXPECTED_SKILLS=(review-and-fix explain-commit worktree-task renovate-update-loop renovate-pr-pass roast plan plan-max)
 REQUIRED_FILES=(
   LICENSE THIRD_PARTY_NOTICES.md CHANGELOG.md README.md AGENTS.md package.json
   .claude-plugin/plugin.json .claude-plugin/marketplace.json plugin.json .agents/plugins/marketplace.json
