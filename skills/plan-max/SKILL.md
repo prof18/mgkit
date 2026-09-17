@@ -1,6 +1,6 @@
 ---
 name: plan-max
-description: Write a detailed multi-file implementation plan for a big or complex feature or project, with an HTML index, one HTML file per milestone and a TODO.md progress tracker, so a cheaper agent can build it step by step under a long-running goal. Use when the user asks for a full plan, a detailed plan for a cheap agent, a plan with index and todo, or when the work is too big for plan.
+description: Write a detailed multi-file implementation plan for a big or complex feature or project, with an HTML index, one HTML file per milestone and a TODO.md progress tracker, so a cheaper agent can build it step by step under a long-running goal. Use when the user asks for a full plan, a detailed plan for a cheap agent, a plan with index and todo, names plan-max, or when the work is too big for plan. The skill checks the size first and recommends the single-file plan skill when the work is small.
 ---
 
 # Plan Max

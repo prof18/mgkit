@@ -1,6 +1,6 @@
 ---
 name: plan
-description: Write a small, precise implementation plan as a single standalone HTML file that a cheaper agent can execute without guessing. Use for small, contained features or fixes, when the user asks to plan a small feature, write a quick plan, or plan this change. For big or multi-part work use plan-max instead.
+description: Write a small, precise implementation plan as a single standalone HTML file that a cheaper agent can execute without guessing. Use whenever the user asks to plan something (plan this feature, plan adding X, write a plan, plan this change, plan a fix) and the work is small and contained. The skill asks clarifying questions before writing anything. For big or multi-part work use plan-max instead.
 ---
 
 # Plan

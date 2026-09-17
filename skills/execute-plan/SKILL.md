@@ -1,6 +1,6 @@
 ---
 name: execute-plan
-description: Implement an existing plan written by plan or plan-max. A single HTML plan file is executed in one run; a plan folder is worked through TODO.md task by task until done, under a long-running goal when the harness has one. Enforces test-first changes, a green gate, review-and-fix before committing, explicit staging, and never pushing. Use when the user says execute the plan, implement the plan, continue the plan, or points at a plan file or folder.
+description: Implement an existing plan written by plan or plan-max. A single HTML plan file is executed in one run; a plan folder is worked through TODO.md task by task until done, under a long-running goal when the harness has one. Enforces test-first changes, a green gate, review-and-fix before committing, explicit staging, and never pushing. Use whenever the user says execute the plan, implement the plan, continue the plan or run the plan, with or without a path: the skill finds plans under plan/ itself and reports when there is none.
 ---
 
 # Execute Plan

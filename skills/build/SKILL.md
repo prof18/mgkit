@@ -1,6 +1,6 @@
 ---
 name: build
-description: Run the full mgkit pipeline for a feature. Plans it, reviews the plan, stops for the user to check the plan, then executes it and runs review-and-fix, stopping at the end for the user's code review. Use when the user says build this, take this feature end to end, or run the whole pipeline.
+description: Run the full mgkit pipeline for a feature: plan it, review the plan, stop for the user to check the plan, then execute it and run review-and-fix, stopping at the end for the user's code review. Use whenever the user starts a request with build (build this, build: add X), asks to take a feature end to end, or to run the whole pipeline. Never implement such a request directly; the plan checkpoint comes first.
 ---
 
 # Build

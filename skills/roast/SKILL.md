@@ -25,7 +25,7 @@ Send one message before asking anything. Be direct and specific; skip compliment
 - **Requirements check.** Only when the user supplied requirements: for each one say keep, change or drop, with a one-line reason, then list requirements that are missing.
 - **Alternatives.** Simpler or different approaches, including not building it at all.
 
-Close the critique with a one-line verdict, for example "Worth building if X; the risky part is Y." Then start round 1 in the same message.
+Close the critique with a one-line verdict, for example "Worth building if X; the risky part is Y." If the subject is new and has no settled name, run the name hunt (phase 3) now and include its table in this message. Then start round 1 in the same message.
 
 ## 3. Phase 2: rounds of questions
 
@@ -59,9 +59,9 @@ Number questions continuously within the round so the user can answer by number 
 - There is no limit on the number of questions. If the user says to wrap up, stop asking and list what is still open.
 - If the user answers "not sure" or replies with a question, explain the trade-off in two or three sentences and ask again with a recommendation.
 
-## 4. Phase 3: name hunt
+## 4. Phase 3: name hunt (inside the first message)
 
-Run this without asking whenever the subject is new and has no settled name (the user gave none, or said the name is open). Skip it otherwise.
+Run this without asking whenever the subject is new and has no settled name (the user gave none, or said the name is open), as part of the first message after the critique. Skip it otherwise.
 
 1. Propose 6 to 10 candidates that fit the subject: short, easy to say, not generic dictionary words.
 2. For every candidate, check and report:
@@ -69,7 +69,7 @@ Run this without asking whenever the subject is new and has no settled name (the
    - The registries or stores that matter for this kind of project: npm, Homebrew, crates.io, PyPI, App Store, Google Play, Obsidian community plugins, VS Code Marketplace, or whichever apply.
    - Domain availability for `.com`, `.dev` and `.app`, using RDAP or `whois`. Report each as likely available, taken, or unknown.
 3. Show a table with columns: name, meaning, conflicts found, domains, verdict. Recommend one.
-4. Choosing the name is a decision: ask it in the next round.
+4. Choosing the name is a decision: ask it in round 1.
 
 ## 5. Phase 4: alignment and the roast file
 
