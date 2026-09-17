@@ -43,7 +43,7 @@ Full details, local-checkout installs and isolated checks: [docs/harnesses.md](d
 **Claude Code**
 
 ```
-/plugin marketplace add <owner>/mgkit
+/plugin marketplace add prof18/mgkit
 /plugin install mgkit@mgkit
 ```
 
@@ -52,7 +52,7 @@ Skills are invoked as `/mgkit:<skill>`.
 **Codex**
 
 ```
-codex plugin marketplace add <owner>/mgkit
+codex plugin marketplace add prof18/mgkit
 codex plugin add mgkit@mgkit
 ```
 
@@ -61,7 +61,7 @@ Mention skills with `$<skill>`.
 **OpenCode** — add to `opencode.json` and restart:
 
 ```json
-{ "plugin": ["mgkit@git+https://github.com/<owner>/mgkit.git"] }
+{ "plugin": ["mgkit@git+https://github.com/prof18/mgkit.git"] }
 ```
 
 Ask for a skill by name ("use the execute-plan skill on …").
@@ -69,12 +69,12 @@ Ask for a skill by name ("use the execute-plan skill on …").
 **Pi**
 
 ```
-pi install git:github.com/<owner>/mgkit
+pi install git:github.com/prof18/mgkit
 ```
 
 Skills are invoked as `/skill:<skill>`.
 
-**Other tools** — `npx skills add <owner>/mgkit`, or copy `skills/` into your tool's skills directory.
+**Other tools** — `npx skills add prof18/mgkit`, or copy `skills/` into your tool's skills directory.
 
 ## Plans
 

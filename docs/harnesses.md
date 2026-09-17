@@ -21,7 +21,7 @@ Wrapper: `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json` (mar
 ### Install (from GitHub, for users)
 
 ```
-/plugin marketplace add <owner>/mgkit
+/plugin marketplace add prof18/mgkit
 /plugin install mgkit@mgkit
 ```
 
@@ -60,7 +60,7 @@ Marketplace source form that works for a plugin at the marketplace root: `{ "sou
 ### Install (from GitHub, for users)
 
 ```
-codex plugin marketplace add <owner>/mgkit
+codex plugin marketplace add prof18/mgkit
 codex plugin add mgkit@mgkit
 ```
 
@@ -96,7 +96,7 @@ Wrapper: `.opencode/plugins/mgkit.js`, referenced by `"main"` in `package.json`.
 Add to `opencode.json` (global `~/.config/opencode/opencode.json` or project) and restart OpenCode:
 
 ```json
-{ "plugin": ["mgkit@git+https://github.com/<owner>/mgkit.git"] }
+{ "plugin": ["mgkit@git+https://github.com/prof18/mgkit.git"] }
 ```
 
 ### Install (local checkout, for development)
@@ -132,7 +132,7 @@ Wrapper: the `pi` key in `package.json`: `"pi": { "skills": ["./skills"] }`.
 ### Install (from GitHub, for users)
 
 ```
-pi install git:github.com/<owner>/mgkit
+pi install git:github.com/prof18/mgkit
 ```
 
 ### Install (local checkout, for development)
@@ -156,7 +156,7 @@ In `$(mktemp -d)`: `pi install -l <root>` writes only `./.pi/settings.json`; `pi
 
 ## Other tools
 
-`npx skills add <owner>/mgkit`, or copy `skills/` into the tool's skills directory.
+`npx skills add prof18/mgkit`, or copy `skills/` into the tool's skills directory.
 
 ## Kickoff lines for execute-plan
 
