@@ -8,7 +8,11 @@ ROOT="${1:-$(git rev-parse --show-toplevel)}"
 ROOT="$(cd "$ROOT" && pwd)"
 
 EXPECTED_SKILLS=(review-and-fix explain-commit worktree-task renovate-update-loop renovate-pr-pass)
-REQUIRED_FILES=(LICENSE THIRD_PARTY_NOTICES.md CHANGELOG.md README.md AGENTS.md package.json)
+REQUIRED_FILES=(
+  LICENSE THIRD_PARTY_NOTICES.md CHANGELOG.md README.md AGENTS.md package.json
+  .claude-plugin/plugin.json .claude-plugin/marketplace.json plugin.json .agents/plugins/marketplace.json
+  .opencode/plugins/mgkit.js docs/harnesses.md docs/authoring.md
+)
 FORBIDDEN_PATTERNS=(
   '/Users/'
   'regesto'
@@ -27,6 +31,9 @@ FORBIDDEN_PATTERNS=(
 # shellcheck source=version-fields.sh
 source "$SCRIPT_DIR/version-fields.sh"
 
+if [ -n "${MGKIT_REQUIRED_FILES:-}" ]; then
+  read -r -a REQUIRED_FILES <<< "$MGKIT_REQUIRED_FILES"
+fi
 if [ -n "${MGKIT_EXPECTED_SKILLS:-}" ]; then
   read -r -a EXPECTED_SKILLS <<< "$MGKIT_EXPECTED_SKILLS"
 fi

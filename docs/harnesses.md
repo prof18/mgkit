@@ -12,6 +12,8 @@ mgkit ships one `skills/` folder plus a thin wrapper per harness.
 
 Facts below were verified on 2026-09-17 with a throwaway fixture plugin, unless listed under "Pending manual verification".
 
+`scripts/install-check.sh [claude|codex|opencode|pi|all]` runs every isolated check below against this repository and prints `ok`/`FAIL` per harness.
+
 ## Claude Code
 
 Wrapper: `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json` (marketplace entry `"source": "./"`). Skills are discovered from the root `skills/` folder. A root `plugin.json` (the Codex manifest) next to them does not affect validation.

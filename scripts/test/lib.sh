@@ -7,6 +7,8 @@ FIXTURES_DIR="$TEST_DIR/fixtures"
 
 export MGKIT_SKIP_TESTS=1
 export MGKIT_SKIP_CLAUDE_VALIDATE=1
+# The fixture repo is minimal: require only the files it ships.
+export MGKIT_REQUIRED_FILES="LICENSE THIRD_PARTY_NOTICES.md CHANGELOG.md README.md AGENTS.md package.json"
 
 _tmp_dirs=()
 _cleanup() { local d; for d in "${_tmp_dirs[@]}"; do rm -rf "$d"; done; }

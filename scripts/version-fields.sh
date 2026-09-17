@@ -5,6 +5,9 @@
 
 VERSION_FIELDS=(
   "package.json|.version"
+  ".claude-plugin/plugin.json|.version"
+  ".claude-plugin/marketplace.json|.plugins[0].version"
+  "plugin.json|.version"
 )
 
 if [ -n "${MGKIT_VERSION_FIELDS:-}" ]; then
