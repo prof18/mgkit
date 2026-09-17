@@ -1,0 +1,17 @@
+{
+  "name": "mgkit",
+  "description": "An opinionated toolkit for building software with AI agents: roast, plan, execute, review, ship.",
+  "version": "0.0.1",
+  "author": {
+    "name": "Marco Gomiero"
+  },
+  "license": "MIT",
+  "keywords": [
+    "skills",
+    "planning",
+    "code-review",
+    "tdd",
+    "workflow",
+    "agents"
+  ]
+}

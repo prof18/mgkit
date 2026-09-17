@@ -43,7 +43,9 @@ For a single session without installing: `claude --plugin-dir /path/to/mgkit`.
 ### Isolated check used by mgkit maintainers
 
 - `claude plugin validate <root>` validates the marketplace manifest; `claude plugin validate <root>/.claude-plugin/plugin.json` validates the plugin manifest; `claude plugin validate <root>/skills` validates the skills. All three must pass.
+- `claude --plugin-dir <root> plugin details mgkit` prints the skill inventory (`Skills (N)  name, …`) without a model call or config change.
 - `claude --plugin-dir <root> -p "<prompt>"` loads the plugin for one run without changing any config.
+- `claude plugin validate <root>/.claude-plugin/plugin.json` warns that the contributor `CLAUDE.md` at the root is not loaded as plugin context; that warning is expected.
 
 ## Codex
 

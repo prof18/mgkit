@@ -1,0 +1,18 @@
+{
+  "name": "mgkit",
+  "description": "mgkit marketplace",
+  "owner": {
+    "name": "Marco Gomiero"
+  },
+  "plugins": [
+    {
+      "name": "mgkit",
+      "description": "An opinionated toolkit for building software with AI agents: roast, plan, execute, review, ship.",
+      "version": "0.0.1",
+      "source": "./",
+      "author": {
+        "name": "Marco Gomiero"
+      }
+    }
+  ]
+}
