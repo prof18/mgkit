@@ -1,0 +1,4 @@
+interface:
+  display_name: "Explain Commit Visually"
+  short_description: "Visual commit walkthroughs with diagrams and code links"
+  default_prompt: "Use $explain-commit to explain this commit with a local HTML walkthrough, before-and-after diagrams, concrete examples, and links to the code."
