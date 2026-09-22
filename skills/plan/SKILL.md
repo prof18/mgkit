@@ -11,7 +11,7 @@ Turn a small feature or fix into one HTML file that a cheaper, less capable agen
 
 Use `plan` when **all** of these are true; otherwise use `plan-max`:
 
-- At most 10 steps, each one commit.
+- At most 10 implementation steps; steps do not prescribe commit boundaries.
 - The change touches one area of the codebase, or a few files across areas for a small cross-cutting change.
 - No new external integration (API, SDK, service, platform capability) and no new persisted data format or migration.
 - One agent session can implement it.
@@ -36,6 +36,10 @@ If the request does not fit, say that `plan-max` fits better and why, and ask wh
 4. **Write** the plan (below).
 5. **Self-check.** Read `references/cheap-agent-bar.md` from this skill's directory and make the plan satisfy every item. Fix gaps before presenting.
 6. **Present** the path, a summary of 5 to 10 lines, any open USER TASKs, and the next step: "Run `plan-review` on it, then `execute-plan`."
+
+## Commit boundaries
+
+Prefer one implementation commit for a small, cohesive feature. Split only at meaningful, independently understandable boundaries that improve reviewability, readability, rollback safety, or separate distinct concerns. State the proposed grouping of steps and the reason for each split in the plan; multiple steps alone do not justify multiple commits.
 
 ## Output
 

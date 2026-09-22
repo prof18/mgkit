@@ -51,7 +51,8 @@ For every HTML file: replace `{{head}}` with the full contents of `../plan/templ
 ## Writing milestones and tasks
 
 - A milestone is a coherent outcome with its own acceptance checks. Order milestones so each one only needs what earlier ones built. Put fact verification that could change later milestones first.
-- A task is one commit. Each task in a milestone file lists: files, the test to write first, instructions, and an acceptance line. `TODO.md` repeats the task title and a short acceptance.
+- A task is a coherent implementation or verification step, not necessarily a commit. Group related tasks into commits and state the boundaries and reasons in `00-conventions.html`. Use small, coherent commits when independently understandable boundaries improve reviewability, readability, rollback safety, or separate distinct concerns; prefer one implementation commit for a small, cohesive feature within the larger work. Do not split merely because there are multiple tasks.
+- Each task in a milestone file lists: files, the test to write first, instructions, and an acceptance line. `TODO.md` repeats the task title and a short acceptance.
 - End every milestone with a task `T<n>.<last> Milestone acceptance check`.
 - Mark human-only work as `USER TASK` in both the milestone file and `TODO.md`.
 

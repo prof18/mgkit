@@ -1,6 +1,6 @@
 # TODO — {{plan title}}
 
-Plan: `plan/{{folder name}}/INDEX.html` · Protocol: `00-conventions.html` · Legend: `[ ]` open · `[x]` done and committed · `USER TASK` for the human · `BLOCKED:` and `DEFERRED:` notes stay indented under unchecked boxes.
+Plan: `plan/{{folder name}}/INDEX.html` · Protocol: `00-conventions.html` · Legend: `[ ]` open · `[x]` done with a recorded implementation or verified commit (shared hashes are valid) · `USER TASK` for the human · `BLOCKED:` and `DEFERRED:` notes stay indented under unchecked boxes.
 
 ## M1 — {{milestone title}} (`01-{{topic}}.html`)
 
