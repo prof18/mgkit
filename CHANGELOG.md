@@ -4,6 +4,15 @@ All notable changes to mgkit. Versions stay 0.0.x until the toolkit is declared 
 
 ## [Unreleased]
 
+## [0.0.2] - 2026-09-22
+
+### Changed
+
+- Prefer one implementation commit for small, cohesive features; split larger work at meaningful boundaries that improve reviewability, readability, rollback safety, or separate distinct concerns.
+- Align planning templates and execution with explicit commit groupings instead of requiring a commit per step or task, preserving tests, gates, staged review, and human checkpoints.
+- Track shared commits and interrupted work across grouped tasks, and record verified commits for verification-only tasks without creating empty commits.
+- Point installation commands at the public `prof18/mgkit` repository.
+
 ## [0.0.1] - 2026-09-17
 
 ### Added
