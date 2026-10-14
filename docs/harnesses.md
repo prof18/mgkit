@@ -89,11 +89,11 @@ Set `CODEX_HOME=$(mktemp -d)` for every command: `codex plugin marketplace add <
 
 ## OpenCode
 
-Wrapper: `.opencode/plugins/mgkit.js`, referenced by `"main"` in `package.json`. OpenCode treats every export of a plugin module as a plugin: a module that also exported a helper function and a string loaded no skills at all, so the file exports only `MgkitPlugin`. Its `config` hook appends the absolute path of `skills/` to `config.skills.paths` (a documented config key: `skills.paths` is scanned recursively for `**/SKILL.md`).
+Wrapper: `.opencode/plugins/mgkit.js`, referenced by `"main"` in `package.json`. One file serves both host generations: OpenCode 2 reads the default export's `id` and `setup()` and registers every `skills/<name>/SKILL.md` through the skill transform (id, name, and description come from the frontmatter); OpenCode 1 (1.18.29+) calls `server()`, whose `config` hook appends the absolute path of `skills/` to `config.skills.paths` (a documented config key: `skills.paths` is scanned recursively for `**/SKILL.md`). OpenCode 1 treats every export of a plugin module as a plugin: a module that also exported a helper function and a string loaded no skills at all, so the file exports only the default object.
 
 ### Install (from GitHub, for users)
 
-Add to `opencode.json` (global `~/.config/opencode/opencode.json` or project) and restart OpenCode:
+Add to `opencode.json` (global `~/.config/opencode/opencode.json` or project) and restart OpenCode — OpenCode 2 also accepts the native plural key `plugins`:
 
 ```json
 { "plugin": ["mgkit@git+https://github.com/prof18/mgkit.git"] }

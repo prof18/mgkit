@@ -9,8 +9,20 @@ node_eval() {
   run_capture node --input-type=module -e "
     import { pathToFileURL } from 'node:url';
     const plugin = await import(pathToFileURL(process.argv[1]).href);
-    const hooks = await plugin.MgkitPlugin({});
-    const register = async (cfg) => { await hooks.config(cfg); return cfg; };
+    const v1Hooks = async () => (await plugin.default.server());
+    const register = async (cfg) => { const hooks = await v1Hooks(); await hooks.config(cfg); return cfg; };
+    const setupV2 = async () => {
+      const added = [];
+      const ctx = {
+        skill: {
+          transform: async (callback) => {
+            callback({ add: (skill) => added.push(skill) });
+          },
+        },
+      };
+      await plugin.default.setup(ctx);
+      return added;
+    };
     $1
   " "$PLUGIN"
 }
@@ -45,11 +57,51 @@ test_preserves_existing_paths() {
   assert_status 0
 }
 
-test_exports_only_the_plugin() {
+test_exports_only_the_dual_plugin() {
   node_eval "
     const names = Object.keys(plugin);
-    if (names.length !== 1 || names[0] !== 'MgkitPlugin') throw new Error('exports: ' + names.join(','));
+    if (names.length !== 1 || names[0] !== 'default') throw new Error('exports: ' + names.join(','));
+    const definition = plugin.default;
+    if (definition.id !== 'mgkit') throw new Error('id: ' + definition.id);
+    if (typeof definition.setup !== 'function') throw new Error('no setup for OpenCode 2');
+    if (typeof definition.server !== 'function') throw new Error('no server for OpenCode 1');
+    const hooks = await v1Hooks();
     if (typeof hooks.config !== 'function') throw new Error('no config hook');
+  "
+  assert_status 0
+}
+
+test_v2_setup_registers_every_skill() {
+  node_eval "
+    import { readdirSync, readFileSync } from 'node:fs';
+    import path from 'node:path';
+    const added = await setupV2();
+    const expected = readdirSync('$SKILLS_DIR', { withFileTypes: true })
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => entry.name)
+      .sort();
+    const ids = added.map((skill) => skill.id).sort();
+    if (JSON.stringify(ids) !== JSON.stringify(expected)) {
+      throw new Error('ids: ' + ids.join(',') + ' expected: ' + expected.join(','));
+    }
+    for (const skill of added) {
+      if (!skill.name) throw new Error(skill.id + ': no name');
+      if (!skill.description) throw new Error(skill.id + ': no description');
+      if (skill.path !== path.join('$SKILLS_DIR', skill.id, 'SKILL.md')) throw new Error(skill.id + ': wrong path');
+      if (skill.content !== readFileSync(skill.path, 'utf8')) throw new Error(skill.id + ': content mismatch');
+      if (!skill.content.startsWith('---')) throw new Error(skill.id + ': content is not the SKILL.md file');
+    }
+  "
+  assert_status 0
+}
+
+test_v2_skill_names_match_frontmatter() {
+  node_eval "
+    const added = await setupV2();
+    const build = added.find((skill) => skill.id === 'build');
+    if (!build) throw new Error('build skill missing');
+    if (build.name !== 'build') throw new Error('name: ' + build.name);
+    if (!build.description.includes('mgkit pipeline')) throw new Error('description: ' + build.description);
   "
   assert_status 0
 }
