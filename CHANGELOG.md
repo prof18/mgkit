@@ -4,6 +4,12 @@ All notable changes to mgkit. Versions stay 0.0.x until the toolkit is declared 
 
 ## [Unreleased]
 
+## [0.0.4] - 2026-10-14
+
+### Fixed
+
+- Quote the `description` frontmatter of the `build` and `execute-plan` skills. The unquoted values contained `: `, which YAML rejected as a nested mapping, so harnesses failed to load both skills.
+
 ## [0.0.3] - 2026-10-14
 
 ### Changed
