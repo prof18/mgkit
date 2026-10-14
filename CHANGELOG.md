@@ -4,6 +4,12 @@ All notable changes to mgkit. Versions stay 0.0.x until the toolkit is declared 
 
 ## [Unreleased]
 
+## [0.0.3] - 2026-10-14
+
+### Changed
+
+- Make the OpenCode plugin speak both host generations from one launcher file: OpenCode 2 reads its `setup()` and registers every mgkit skill through the skill transform, while OpenCode 1 (1.18.29+) keeps the `config` hook that appends `skills/` to `skills.paths`. The file still exports exactly one thing, now the default object.
+
 ## [0.0.2] - 2026-09-22
 
 ### Changed
