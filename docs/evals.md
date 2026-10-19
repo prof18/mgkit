@@ -39,6 +39,14 @@ Results are written to `evals/results/<timestamp>/` (gitignored).
 
 ## Results
 
+### 2026-10-19 (Claude Code 2.1.281, 1 run per arm)
+
+| Case | WITH | W/OUT | Δ | Iterations |
+|---|---|---|---|---|
+| `plan-to-docs-no-plans` | 1.00 | 1.00 | 0.00 | passed on run 1 |
+
+The skill fired on the trigger phrase. No delta, because the baseline also declines to invent plans in an empty directory; the case guards against the skill writing or deleting anything when there is nothing to retire. Cost $0.17.
+
 ### 2026-09-17 (Claude Code 2.1.269, 1 run per arm)
 
 Final scores after two wording iterations. `WITH` is with mgkit loaded, `W/OUT` is the no-plugin baseline.

@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "mgkit",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "An opinionated toolkit for building software with AI agents: roast, plan, execute, review, ship.",
   "author": {
     "name": "Marco Gomiero"
