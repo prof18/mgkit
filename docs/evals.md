@@ -35,6 +35,7 @@ Results are written to `evals/results/<timestamp>/` (gitignored).
 | `plan-max-suggests-plan` | plan-max fires; says the task is too small, points to `plan` or a direct fix, asks how to proceed; no file writes |
 | `execute-plan-no-plan` | execute-plan fires; reports no plan found and where plans are expected; no file writes |
 | `build-stops-at-checkpoint` | build fires; stops for an explicit go before implementing; no `git commit` |
+| `plan-to-docs-no-plans` | plan-to-docs fires; reports that no finished plan was found and where it looked; no file writes |
 
 ## Results
 

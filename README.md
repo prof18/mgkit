@@ -16,7 +16,7 @@ mgkit encodes one way of working, and it is opinionated on purpose:
 ## Pipeline
 
 ```
-roast ──▶ plan / plan-max ──▶ plan-review ──▶ [you check the plan] ──▶ execute-plan ──▶ review-and-fix ──▶ [you review the code]
+roast ──▶ plan / plan-max ──▶ plan-review ──▶ [you check the plan] ──▶ execute-plan ──▶ review-and-fix ──▶ [you review the code] ──▶ plan-to-docs
           └───────────────────────────────── build runs all of this end to end ─────────────────────────────────┘
 ```
 
@@ -31,6 +31,7 @@ roast ──▶ plan / plan-max ──▶ plan-review ──▶ [you check the p
 | `execute-plan` | Implements a small plan in one run, or a big plan task by task from `TODO.md` | A reviewed plan is ready |
 | `review-and-fix` | One bounded review pass: grade findings, fix only confirmed ones | Before a commit, a merge, or after a large change |
 | `build` | Runs plan, plan-review, execute-plan and review-and-fix, stopping twice for you | You want a feature taken end to end |
+| `plan-to-docs` | Turns finished plans into present-tense docs written from the code, points `AGENTS.md` at them, and deletes the plans | A plan is done and should become documentation |
 | `explain-commit` | Visual walkthrough of a commit, range, PR or diff | You need to understand a change |
 | `worktree-task` | Does a task in an isolated Git worktree, merges it back, cleans up | You want work isolated from your checkout |
 | `renovate-update-loop` | Processes Renovate update PRs locally, one by one, with full validation | Dependency updates piled up |

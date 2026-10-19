@@ -1,0 +1,4 @@
+interface:
+  display_name: "Plan to Docs"
+  short_description: "Turn finished plans into present-tense docs and retire them"
+  default_prompt: "Use $plan-to-docs to turn the finished plans into docs written from the code, point AGENTS.md at them, and retire the old plans."

@@ -4,6 +4,10 @@ All notable changes to mgkit. Versions stay 0.0.x until the toolkit is declared 
 
 ## [Unreleased]
 
+### Added
+
+- `plan-to-docs`: turn finished plans into present-tense docs written from the code, record the decisions that lived only in the plans, point `AGENTS.md` at the docs, fix every link to the plans and delete them once you agree. Its writing guide adapts chrisbanes/skills `grounded-writing` (Apache-2.0) and mattpocock/skills `writing-for-agents` (MIT).
+
 ## [0.0.4] - 2026-10-14
 
 ### Fixed
