@@ -4,6 +4,11 @@ All notable changes to mgkit. Versions stay 0.0.x until the toolkit is declared 
 
 ## [Unreleased]
 
+### Changed
+
+- `scripts/install-check.sh opencode` works on OpenCode 2, which removed `opencode debug skill`: it installs the committed state with `opencode plugin add` into an isolated XDG home and checks the skills the installed copy registers through `setup()`. OpenCode 1 keeps the old check.
+- `docs/harnesses.md` documents how to update mgkit in Claude Code, Codex, OpenCode and Pi, and records the harness versions re-verified on 2026-10-19.
+
 ## [0.0.5] - 2026-10-19
 
 ### Added

@@ -52,12 +52,42 @@ check_codex() {
 
 check_opencode() {
   have opencode || return 0
+  case "$(opencode --version 2>/dev/null)" in
+    *v2.* | 2.*) check_opencode2 ;;
+    *) check_opencode1 ;;
+  esac
+}
+
+check_opencode1() {
   local config project found
   config="$(new_tmp)"; project="$(new_tmp)"
   printf '{"plugin": ["file://%s/.opencode/plugins/mgkit.js"]}\n' "$ROOT" > "$config/opencode.json"
   # Write to a file: piped output of `opencode debug skill` is cut off at about 64 KB.
   (cd "$project" && OPENCODE_CONFIG_DIR="$config" OPENCODE_DISABLE_EXTERNAL_SKILLS=1 opencode debug skill > "$project/skills.json" 2>/dev/null) || true
   found="$(jq -r '.[].name' "$project/skills.json" 2>/dev/null || true)"
+  report opencode "$found"
+}
+
+# OpenCode 2 has no model-free command that lists skills. Install the committed state with OpenCode's own
+# `plugin add` into an isolated XDG home, then call the installed copy's setup() the way OpenCode 2 does
+# and report the skills it registers.
+check_opencode2() {
+  local home project installed found
+  home="$(new_tmp)"; project="$(new_tmp)"
+  if ! (cd "$project" && XDG_CONFIG_HOME="$home/config" XDG_DATA_HOME="$home/data" XDG_STATE_HOME="$home/state" \
+    XDG_CACHE_HOME="$home/cache" opencode plugin add "mgkit@git+file://$ROOT" >/dev/null 2>&1); then
+    printf 'FAIL opencode: plugin add failed\n'; failed=1; return 0
+  fi
+  installed="$(find "$home/cache" -path '*/node_modules/mgkit/package.json' 2>/dev/null | head -n 1)"
+  [ -n "$installed" ] || { printf 'FAIL opencode: installed package not found\n'; failed=1; return 0; }
+  installed="$(dirname "$installed")"
+  found="$(node --input-type=module -e '
+    import { pathToFileURL } from "node:url";
+    const plugin = await import(pathToFileURL(process.argv[1]).href);
+    const added = [];
+    await plugin.default.setup({ skill: { transform: async (callback) => callback({ add: (skill) => added.push(skill) }) } });
+    console.log(added.map((skill) => skill.name).join("\n"));
+  ' "$installed/$(jq -r .main "$installed/package.json")" 2>/dev/null || true)"
   report opencode "$found"
 }
 

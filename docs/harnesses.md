@@ -4,13 +4,13 @@ mgkit ships one `skills/` folder plus a thin wrapper per harness.
 
 | Harness | Tested version | Support level |
 |---|---|---|
-| Claude Code | 2.1.269 | tested before release |
-| Codex CLI | 0.144.6 | tested before release |
-| OpenCode | 1.18.31 | tested before release |
-| Pi | 0.85.1 | tested before release |
+| Claude Code | 2.1.281 | tested before release |
+| Codex CLI | 0.162.1 | tested before release |
+| OpenCode | 2.0.29 (1.18.31 for the OpenCode 1 path) | tested before release |
+| Pi | 1.2.0 | tested before release |
 | Others (plain skills) | — | best effort |
 
-Facts below were verified on 2026-09-17 with a throwaway fixture plugin, unless listed under "Pending manual verification".
+Facts below were verified on 2026-09-17 with a throwaway fixture plugin, unless listed under "Pending manual verification". The install checks and the update commands were re-verified on 2026-10-19 with the versions in the table.
 
 `scripts/install-check.sh [claude|codex|opencode|pi|all]` runs every isolated check below against this repository and prints `ok`/`FAIL` per harness.
 
@@ -33,6 +33,15 @@ claude plugin install mgkit@mgkit
 ```
 
 For a single session without installing: `claude --plugin-dir /path/to/mgkit`.
+
+### Update
+
+```
+claude plugin marketplace update mgkit
+claude plugin update mgkit@mgkit
+```
+
+The first command re-clones the marketplace; the second installs the new version into `~/.claude/plugins/cache/mgkit/mgkit/<version>/`. Restart Claude Code to load it. Inside a session, `/plugin` offers the same update.
 
 ### Invoke a skill
 
@@ -73,7 +82,16 @@ codex plugin marketplace add /path/to/mgkit
 codex plugin add mgkit@mgkit
 ```
 
-A local marketplace is recorded in `config.toml` with `source_type = "local"`; `codex plugin marketplace upgrade` refreshes Git marketplaces. A local install copies the whole working tree into the plugin cache, untracked files included; reinstall (`codex plugin remove mgkit@mgkit` then `codex plugin add mgkit@mgkit`) to pick up changes.
+A local marketplace is recorded in `config.toml` with `source_type = "local"`. A local install copies the whole working tree into the plugin cache, untracked files included; reinstall (`codex plugin remove mgkit@mgkit` then `codex plugin add mgkit@mgkit`) to pick up changes.
+
+### Update
+
+```
+codex plugin marketplace upgrade mgkit
+codex plugin add mgkit@mgkit
+```
+
+`marketplace upgrade` refreshes the Git marketplace, and `codex plugin list` then reports the new version, but the plugin cache only gains `~/.codex/plugins/cache/mgkit/mgkit/<version>/` after `plugin add`. Start a new session afterwards.
 
 ### Invoke a skill
 
@@ -111,7 +129,11 @@ Either spec works (both verified):
 { "plugin": ["mgkit@git+file:///path/to/mgkit"] }
 ```
 
-The `git+file` form installs the committed state into `~/.cache/opencode/packages/`; the `file://` form reads the working tree directly.
+The `git+file` form installs the committed state into the OpenCode cache (`~/.cache/opencode/packages/` on OpenCode 1, `~/.cache/opencode/npm/git-mgkit-<hash>/<timestamp>/node_modules/mgkit` on OpenCode 2); the `file://` form reads the working tree directly. On OpenCode 2, `opencode plugin add <spec>` installs a plugin and adds it to the global config in one step.
+
+### Update
+
+A Git spec is fetched again into a new timestamped folder in the cache; on OpenCode 2.0.29 the new release was picked up with no manual step. Restart OpenCode to load it. `opencode plugin update` covers npm package plugins only and reports "No package plugins found" for a Git spec.
 
 ### Invoke a skill
 
@@ -123,7 +145,10 @@ None (`opencode --help` has no goal mode). `execute-plan` loops through `TODO.md
 
 ### Isolated check used by mgkit maintainers
 
-`OPENCODE_CONFIG_DIR=$(mktemp -d)` with an `opencode.json` containing the `file://` spec, plus `OPENCODE_DISABLE_EXTERNAL_SKILLS=1` so skills under `~/.claude` and `~/.agents` don't mix in; run `opencode debug skill` from a temp directory with its output redirected to a file (piped output is cut off at about 64 KB, which the full skill set exceeds) and check the JSON array (`jq -r '.[].name' file`) lists every skill. No login needed. The global `~/.config/opencode/opencode.json` is not touched.
+`scripts/install-check.sh opencode` picks the path from `opencode --version`. Neither needs a login, and neither touches the global `~/.config/opencode/opencode.json`.
+
+- **OpenCode 2.** There is no model-free command that lists skills: `opencode debug skill` is gone, and `GET /api/skill` and `GET /api/plugin` on a `--standalone` server return empty lists before a session runs. Instead, point `XDG_CONFIG_HOME`, `XDG_DATA_HOME`, `XDG_STATE_HOME` and `XDG_CACHE_HOME` at a temp directory, run `opencode plugin add "mgkit@git+file://<root>"` (it installs the committed state, so commit first), then import the installed copy's `main` and call `setup()` with a stub `skill.transform`, the way OpenCode 2 registers skills, and check every skill was added.
+- **OpenCode 1.** `OPENCODE_CONFIG_DIR=$(mktemp -d)` with an `opencode.json` containing the `file://` spec, plus `OPENCODE_DISABLE_EXTERNAL_SKILLS=1` so skills under `~/.claude` and `~/.agents` don't mix in; run `opencode debug skill` from a temp directory with its output redirected to a file (piped output is cut off at about 64 KB, which the full skill set exceeds) and check the JSON array (`jq -r '.[].name' file`) lists every skill.
 
 ## Pi
 
@@ -141,6 +166,14 @@ pi install git:github.com/prof18/mgkit
 pi install /path/to/mgkit          # global
 pi install -l /path/to/mgkit       # project-local (.pi/settings.json)
 ```
+
+### Update
+
+```
+pi update git:github.com/prof18/mgkit
+```
+
+Pulls the Git package in `~/.pi/agent/git/github.com/prof18/mgkit`; plain `pi update` updates every package. Restart Pi to load it.
 
 ### Invoke a skill
 
