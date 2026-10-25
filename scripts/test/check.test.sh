@@ -71,6 +71,13 @@ test_forbidden_pattern() {
   assert_contains "FAIL C6"
 }
 
+test_difftray_name_allowed() {
+  local root; root="$(new_fixture)"
+  printf '\nShow the findings in Difftray (difftray review inspect).\n' >> "$root/skills/sample/SKILL.md"
+  run_capture "$CHECK" "$root"
+  assert_status 0
+}
+
 test_missing_attribution() {
   local root; root="$(new_fixture)"
   printf '\n<!-- Adapted from https://github.com/a/b (x, commit y), MIT License. -->\n' >> "$root/skills/sample/SKILL.md"

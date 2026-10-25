@@ -20,7 +20,6 @@ FORBIDDEN_PATTERNS=(
   'feed-?flow'
   'reader-?flow'
   'pomo-?stats'
-  'difftray'
   'klead'
   'bivio'
   'pcenter'
