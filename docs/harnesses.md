@@ -187,6 +187,20 @@ None built in (Pi README: sub-agents and plan modes are left to extensions). `ex
 
 In `$(mktemp -d)`: `pi install -l <root>` writes only `./.pi/settings.json`; `pi list -a` (the `-a` trusts project-local settings) prints the package under "Project packages". Plain `pi list` without `-a` prints "No packages installed." for project-local installs. The global `~/.pi/agent/settings.json` is not touched.
 
+## Review panel seats
+
+`skills/review-and-fix/scripts/panel.sh` starts each seat read-only from the repository root, with the prompt on stdin. Verified on 2026-10-25 with Claude Code 2.1.308, Codex CLI 0.162.1 and Pi 1.2.0:
+
+| Seat | Command |
+|---|---|
+| claude | `claude -p --permission-mode plan --tools Read,Grep,Glob --strict-mcp-config --no-session-persistence [--model M]` |
+| codex | `codex exec -s read-only --ephemeral --ignore-user-config --disable apps -o <out>/codex.md [-m M] -` |
+| pi | `pi -p --tools read,grep,find,ls --no-extensions --no-skills --no-session --no-approve --offline [--model M]` |
+
+The seats need network access, and they write to the panel directory in the session scratch. A driver running in a sandbox that blocks either must run the script outside the sandbox, with the user's approval. Difftray 0.0.16's `feedback submit` takes `actor {name, runId}` per batch, which is how each seat gets its own author.
+
+Neither CLI's read-only switch covers MCP tools. Without `--strict-mcp-config`, the claude seat sees every MCP server the user configured, write tools included. In codex, `-c mcp_servers={}` changes nothing, while `--ignore-user-config --disable apps` drops the servers and plugins from `config.toml` and the apps connectors.
+
 ## Other tools
 
 `npx skills add prof18/mgkit`, or copy `skills/` into the tool's skills directory.

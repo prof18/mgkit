@@ -1,6 +1,6 @@
 ---
 name: plan-review
-description: Review an implementation plan, either a single-file plan or a multi-file plan folder, in one thorough pass and fix it in place. Checks consistency, security, performance, missing pieces, dark paths, anything a cheaper implementing agent could misread, API and tooling facts against current docs, and conformance to the roast decisions. Use when the user asks to review, validate, double-check or harden a plan, or before executing one.
+description: Review an implementation plan, either a single-file plan or a multi-file plan folder, in one thorough pass and fix it in place. Checks consistency, security, performance, missing pieces, dark paths, anything a cheaper implementing agent could misread, API and tooling facts against current docs, and conformance to the roast decisions. Uses a panel of the other installed agent CLIs (Claude Code, Codex, Pi) for up to 3 rounds when available. Use when the user asks to review, validate, double-check or harden a plan, or before executing one.
 ---
 
 # Plan Review
@@ -28,14 +28,15 @@ Make a plan safe to hand to a cheaper agent: find what is wrong, missing or ambi
 | Roast conformance | Every roast decision is reflected; no rejected option appears; open questions are resolved or turned into USER TASKs or verification steps. |
 | User focus | If the user named a focus ("API resilience", "security"), go deeper on it in addition to the lenses above. |
 
-If you can start subagents, you may split the lenses across at most 3 reviewers, each with a self-contained prompt; you merge, verify and decide. Otherwise do the whole pass yourself.
+Always do the whole pass yourself. Also read `../review-and-fix/references/panel.md` (relative to this skill's directory; if unresolvable, find `skills/review-and-fix/references/panel.md` in the mgkit installation) and check seat availability. With at least one other seat available, run panel round 1 on the plan while you do your pass, with the lenses above as the task and the plan path as the target. Keep the panel files and findings in the session scratch directory; plan reviews never use Difftray. Without a panel, if you can start subagents, you may split the lenses across at most 3 reviewers, each with a self-contained prompt; you merge, verify and decide.
 
 ## 3. Grade and fix
 
 - Give every finding a severity (critical, high, medium, low), an evidence-based confidence (high: traced or verified; medium: traced with a stated assumption; low: speculation), its lens, and its location (file plus section or task id).
 - Discard low-confidence findings.
 - Fix in place every remaining finding that has one correct fix consistent with the plan's decisions. Keep structure and ids stable. If a task must be split, use sub-ids (`T3.2a`, `T3.2b`) and update `TODO.md` to match.
-- A finding that needs a decision the plan has not made goes to the user as a question:
+- With a panel: take the round-1 plan snapshot before your first edit, then run rounds 2 and 3 as `panel.md` describes; its "Snapshots" part says how to show the plan changes since the last round. Objections you accept and new critical or high findings are graded and fixed like the others.
+- A finding that needs a decision the plan has not made, and every objection still open when the panel stops, goes to the user as a question:
 
   ```
   ❓ **Q1 - <short title>**: <question, with options>
@@ -51,6 +52,7 @@ If you can start subagents, you may split the lenses across at most 3 reviewers,
 ```
 ## Plan review — <path>
 Fixed: <n> · Needs decision: <n> · Discarded: <n>
+<panel lines from section 5 of panel.md, when a panel ran>
 
 | # | Severity | Lens | Where | Finding | Action |
 |---|---|---|---|---|---|

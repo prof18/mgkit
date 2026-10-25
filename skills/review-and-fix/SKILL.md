@@ -1,6 +1,6 @@
 ---
 name: review-and-fix
-description: "Run a budget-conscious, agent-assisted codebase review and remediation pass. Use when the user asks to review and fix, run a code review pass, or review a whole repository, branch, PR, or large change set for bugs, performance issues, accessibility problems, build/release risks, or general quality problems; to split review work across subagents; to grade, filter, and fix validated findings; or to run another review pass. Defaults: one review pass with 1-3 mid-tier reviewer subagents, main-agent verification and grading, a single fix worker, then stop. Further passes run only when the user asks, and reuse the session findings ledger."
+description: "Run a budget-conscious, agent-assisted codebase review and remediation pass. Use when the user asks to review and fix, run a code review pass, or review a whole repository, branch, PR, or large change set for bugs, performance issues, accessibility problems, build/release risks, or general quality problems; to split review work across subagents; to grade, filter, and fix validated findings; or to run another review pass. Defaults: one review pass by a panel of the other installed agent CLIs (Claude Code, Codex, Pi) moderated by the main agent for up to 3 rounds, with findings shown per author in Difftray when it is available, or by 1-3 mid-tier reviewer subagents when no other CLI is installed; main-agent verification and grading, a single fix worker, then stop. Further passes run only when the user asks, and reuse the session findings ledger."
 ---
 
 # Review and Fix
@@ -13,6 +13,7 @@ The user starts additional passes explicitly. Each pass reuses the session findi
 
 Subagents are expensive. Spawn only the agents a step actually needs.
 
+- **Panel first.** Read `references/panel.md` (relative to this skill's directory) and check seat availability. With at least one other seat available, the panel seats are the reviewers and you review too, as the driver: spawn no reviewer subagents. The bullets on reviewers below apply only without a panel.
 - **Reviewers:** 1 for a small repo or diff, 2-3 for large codebases, split by real domain boundaries. Hard cap 3 unless the user asks for more.
 - **Reviewer model:** mid-tier. Reviewers optimize for recall; the main agent provides precision.
 - **Verification:** done by the main agent. Spawn one verifier agent for the whole batch only when merged findings exceed ~10. Never spawn one verifier per finding.
@@ -21,7 +22,7 @@ Subagents are expensive. Spawn only the agents a step actually needs.
 - Launch every subagent with fresh context (no inherited conversation, e.g. `fork_turns="none"`) and a self-contained prompt.
 - If subagents are unavailable, say so briefly and run the same steps locally.
 
-Typical total: 2-4 subagents per pass.
+Typical total: 2-4 subagents per pass without a panel; with a panel, the seats plus at most one fix worker.
 
 ## Ground Rules
 
@@ -126,11 +127,12 @@ On release, beta, hotfix, signing, notarization, packaging, or store-submission 
    - Choose the reviewer count and shard map within the Agent Budget.
 
 2. **Review.**
-   - Launch 1-3 read-only reviewers in parallel with the Reviewer Prompt below.
-   - While they run, inspect the highest-risk code paths yourself instead of waiting idle.
+   - With a panel: run round 1 as `references/panel.md` describes, with the Reviewer Prompt below as the task, and do your own full review of the same scope meanwhile.
+   - Without a panel: launch 1-3 read-only reviewers in parallel with the Reviewer Prompt below. While they run, inspect the highest-risk code paths yourself instead of waiting idle.
 
 3. **Merge.**
    - Collect all findings, including your own. Dedupe by root cause, not by file:line.
+   - With a panel, number findings `P1`, `P2`, … with their sources as `references/panel.md` says, and include comments the user left in Difftray.
    - Drop anything matching `rejected`/`discarded` ledger entries for unchanged code.
    - Findings reported independently by two reviewers get confidence raised one level.
 
@@ -152,7 +154,9 @@ On release, beta, hotfix, signing, notarization, packaging, or store-submission 
    - Run focused tests, then the repo's required gate. If the gate needs an unavailable device/credential, run as far as possible and record the exact prerequisite.
    - Commit per the frozen commit policy, staging only intended files. Record the commit in the ledger.
 
-7. **Report and stop.** Do not start another pass unless the user asks.
+7. **Panel rounds.** With a panel, run rounds 2 and 3 as `references/panel.md` describes, on your dispositions and the fix diff. Objections you accept and new critical or high findings go through steps 4-6 again. Stop by its stop rule; never run a fourth round.
+
+8. **Report and stop.** Do not start another pass unless the user asks.
 
 ## Additional Passes (user-requested)
 
@@ -161,6 +165,7 @@ When the user asks for another pass:
 - Re-baseline with `git status --short`.
 - Reuse the session ledger as the skip list; tell reviewers to prioritize areas not already covered.
 - Follow the same Agent Budget and Workflow.
+- A new pass starts its own panel at round 1, with the ledger as the skip list.
 - If the user asks for a "deep" or parallel review (e.g. two models on the same baseline), merge all reviewer output before verification.
 
 ## Long-Running Reviews
@@ -168,6 +173,7 @@ When the user asks for another pass:
 - Real review work can take many minutes; treat advancing progress as healthy.
 - Inspect a quiet reviewer only after repeated missing heartbeats, an explicit failure, or the environment timeout.
 - If a reviewer fails (sandbox, auth, rate limit, capacity), report it and continue with remaining evidence instead of inventing results.
+- Panel seats have no time limit unless `MGKIT_PANEL_TIMEOUT` is set. Follow their progress in each seat's log file.
 
 ## Reviewer Prompt
 
@@ -198,7 +204,7 @@ Report changed files, tests added, and commands run with results.
 
 Keep it concise:
 
-- Agents used (reviewers, verifier if any, workers).
+- Agents used (reviewers, verifier if any, workers), and the panel lines from section 5 of `references/panel.md` when a panel ran.
 - Findings funnel: reported -> merged -> fixed / follow-up / escalate / rejected / discarded (counts).
 - Fixed findings, one line each, with commit or "left uncommitted".
 - Follow-ups and escalations, one line each.

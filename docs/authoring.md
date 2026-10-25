@@ -2,7 +2,7 @@
 
 ## Skill rules
 
-- **Format.** `skills/<name>/SKILL.md` with YAML frontmatter containing exactly `name` (equal to the folder name, kebab-case, at most 64 characters) and `description` (at most 1024 characters, one line, saying what the skill does and when to use it, including trigger phrases). Optional files live next to it: `templates/`, `references/`, `agents/openai.yaml`.
+- **Format.** `skills/<name>/SKILL.md` with YAML frontmatter containing exactly `name` (equal to the folder name, kebab-case, at most 64 characters) and `description` (at most 1024 characters, one line, saying what the skill does and when to use it, including trigger phrases). Optional files live next to it: `templates/`, `references/`, `scripts/` (shell scripts the skill runs with `bash <path>`; keep them compatible with bash 3.2 and covered by a `scripts/test/*.test.sh`), `agents/openai.yaml`.
 - **Length.** `SKILL.md` is at most 300 lines. Move long templates and reference material to `templates/` or `references/` and tell the agent when to read them.
 - **Voice.** Imperative, second person ("Read…", "Ask…"). English only. The conversation with the user follows the user's language; every written artifact (plans, TODOs, roast files, commits) is English.
 - **No personal content.** No `/Users/` paths, no names of private projects, no knowledge-base tools, no email addresses. `scripts/check.sh` enforces this.

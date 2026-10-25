@@ -37,6 +37,22 @@ roast ──▶ plan / plan-max ──▶ plan-review ──▶ [you check the p
 | `renovate-update-loop` | Processes Renovate update PRs locally, one by one, with full validation | Dependency updates piled up |
 | `renovate-pr-pass` | Merges green Renovate PRs and triggers rebases for blocked ones | Quick pass over Renovate PRs on GitHub |
 
+## Review panel
+
+`plan-review` and `review-and-fix` review with a panel when more than one agent CLI is installed. The agent you are talking to is the driver. Every other CLI among [Claude Code](https://claude.com/claude-code), [Codex](https://github.com/openai/codex) and [Pi](https://pi.dev) reviews the same plan or diff read-only and in parallel. Then the driver moderates up to 3 rounds in which the seats agree with or object to its decisions. The driver makes every change and has the final word; objections still open come to you.
+
+For code reviews, the discussion shows up in [Difftray](https://difftray.app/): every seat comments under its own name, the driver answers each finding, and comments you add there are picked up in the next round.
+
+Seats use each CLI's default model; the Codex seat skips your `config.toml` so it gets no MCP servers, which means Codex's built-in default. To pin one, or to change the seats, create `~/.config/mgkit/panel.conf`:
+
+```
+MGKIT_PANEL_SEATS=claude codex pi
+MGKIT_PANEL_PI_MODEL=zai/glm-5.3
+MGKIT_PANEL_TIMEOUT=
+```
+
+Seats have no time limit unless `MGKIT_PANEL_TIMEOUT` (seconds) is set. With no other CLI installed, both skills review on their own as before. The panel's round cap takes inspiration from [hamen/ship-feature](https://github.com/hamen/ship-feature).
+
 ## Install
 
 Full details, local-checkout installs and isolated checks: [docs/harnesses.md](docs/harnesses.md).

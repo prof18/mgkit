@@ -4,10 +4,15 @@ All notable changes to mgkit. Versions stay 0.0.x until the toolkit is declared 
 
 ## [Unreleased]
 
+### Added
+
+- Review panel for `plan-review` and `review-and-fix`: the other installed agent CLIs (Claude Code, Codex, Pi) review read-only next to the driving agent, then up to 3 driver-moderated rounds settle the findings. Code-review findings and decisions appear per author in Difftray. Seats and models are set in `~/.config/mgkit/panel.conf`.
+
 ### Changed
 
 - `scripts/install-check.sh opencode` works on OpenCode 2, which removed `opencode debug skill`: it installs the committed state with `opencode plugin add` into an isolated XDG home and checks the skills the installed copy registers through `setup()`. OpenCode 1 keeps the old check.
 - `docs/harnesses.md` documents how to update mgkit in Claude Code, Codex, OpenCode and Pi, and records the harness versions re-verified on 2026-10-19.
+- `scripts/check.sh` no longer forbids skills from naming Difftray.
 
 ## [0.0.5] - 2026-10-19
 
