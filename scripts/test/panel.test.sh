@@ -84,6 +84,7 @@ test_run_uses_read_only_flags() {
   panel "$d" run --driver claude --prompt-file "$d/prompt.md" --out-dir "$d/out2" --repo "$d"
   assert_file_contains "$d/codex.args" "read-only"
   assert_file_contains "$d/codex.args" "--ignore-user-config"
+  assert_file_contains "$d/codex.args" "--skip-git-repo-check"
   assert_file_contains "$d/codex.args" "apps"
   assert_file_contains "$d/pi.args" "read,grep,find,ls"
 }

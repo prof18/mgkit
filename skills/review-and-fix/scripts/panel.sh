@@ -69,7 +69,8 @@ exec_seat() {
       ;;
     codex)
       # -s read-only does not cover MCP tools: skip config.toml (its MCP servers and plugins; auth stays) and apps.
-      args=(exec -s read-only --ephemeral --ignore-user-config --disable apps -o "$out/$seat.md")
+      # --skip-git-repo-check: a plan is often reviewed before its folder is a git repository; the seat writes nothing.
+      args=(exec -s read-only --ephemeral --ignore-user-config --disable apps --skip-git-repo-check -o "$out/$seat.md")
       if [ -n "${MGKIT_PANEL_CODEX_MODEL:-}" ]; then args+=(-m "$MGKIT_PANEL_CODEX_MODEL"); fi
       exec codex "${args[@]}" - <"$prompt" >"$out/$seat.log" 2>&1
       ;;
