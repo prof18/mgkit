@@ -22,7 +22,10 @@ new_stubs() {
 #!/bin/bash
 printf '%s\n' "\$@" >"$dir/$seat.args"
 cat >/dev/null
-eval "sleep_for=\\\${STUB_SLEEP_$seat:-0}; exit_with=\\\${STUB_EXIT_$seat:-0}; empty=\\\${STUB_EMPTY_$seat:-}"
+eval "sleep_for=\\\${STUB_SLEEP_$seat:-0}; exit_with=\\\${STUB_EXIT_$seat:-0}; empty=\\\${STUB_EMPTY_$seat:-}; fail_model=\\\${STUB_FAIL_MODEL_$seat:-}"
+for a in "\$@"; do
+  if [ -n "\$fail_model" ] && [ "\$a" = "\$fail_model" ]; then echo "429 rate limit reached for \$a" >&2; exit 1; fi
+done
 sleep "\$sleep_for"
 text="review from $seat"
 [ -z "\$empty" ] || text=""
@@ -141,6 +144,49 @@ test_timeout_does_not_delay_fast_seats() {
   MGKIT_PANEL_TIMEOUT=30 panel "$d" run --driver claude --prompt-file "$d/prompt.md" --out-dir "$d/out" --repo "$d"
   assert_status 0
   [ $(( $(date +%s) - start )) -lt 10 ] || fail "a pending timeout watcher held the output open"
+}
+
+test_pi_falls_back_when_its_model_fails() {
+  local d; d="$(new_stubs pi)"
+  MGKIT_PANEL_PI_MODEL=zai/glm-5.3 MGKIT_PANEL_PI_FALLBACK_MODEL=xai/grok-4.7 STUB_FAIL_MODEL_pi=zai/glm-5.3 \
+    panel "$d" run --driver claude --prompt-file "$d/prompt.md" --out-dir "$d/out" --repo "$d"
+  assert_status 0
+  assert_contains $'pi\tok'
+  assert_contains "fallback xai/grok-4.7 after exit 1: 429 rate limit"
+  assert_file_contains "$d/pi.args" "xai/grok-4.7"
+  assert_file_contains "$d/out/pi.primary.log" "429 rate limit"
+  assert_file_contains "$d/out/pi.md" "review from pi"
+}
+
+test_pi_loads_only_the_named_extensions() {
+  local d; d="$(new_stubs pi)"
+  HOME="$d" MGKIT_PANEL_PI_EXTENSIONS="~/ext/provider /opt/other.ts" \
+    panel "$d" run --driver claude --prompt-file "$d/prompt.md" --out-dir "$d/out" --repo "$d"
+  assert_status 0
+  assert_file_contains "$d/pi.args" "--no-extensions"
+  assert_file_contains "$d/pi.args" "$d/ext/provider"
+  assert_file_contains "$d/pi.args" "/opt/other.ts"
+  [ "$(grep -c '^-e$' "$d/pi.args")" -eq 2 ] || fail "expected two -e flags"
+}
+
+test_pi_reports_a_failed_fallback() {
+  local d; d="$(new_stubs pi)"
+  MGKIT_PANEL_PI_FALLBACK_MODEL=xai/grok-4.7 STUB_EXIT_pi=1 \
+    panel "$d" run --driver claude --prompt-file "$d/prompt.md" --out-dir "$d/out" --repo "$d"
+  assert_status 3
+  assert_contains $'pi\tfailed\texit 1'
+  assert_contains "fallback xai/grok-4.7"
+}
+
+test_pi_does_not_fall_back_after_a_timeout() {
+  local d start; d="$(new_stubs pi)"
+  start="$(date +%s)"
+  MGKIT_PANEL_PI_FALLBACK_MODEL=xai/grok-4.7 STUB_SLEEP_pi=30 MGKIT_PANEL_TIMEOUT=2 \
+    panel "$d" run --driver claude --prompt-file "$d/prompt.md" --out-dir "$d/out" --repo "$d"
+  assert_status 3
+  assert_contains "timed out after 2s"
+  [ ! -e "$d/out/pi.fallback" ] || fail "fell back after a timeout"
+  [ $(( $(date +%s) - start )) -lt 15 ] || fail "the timeout did not stop the seat"
 }
 
 test_no_timeout_by_default() {

@@ -15,6 +15,8 @@ A panel puts other agent CLIs next to you on the same review. You are the **driv
   | `MGKIT_PANEL_CLAUDE_MODEL` | `--model` for the claude seat | CLI default |
   | `MGKIT_PANEL_CODEX_MODEL` | `-m` for the codex seat | CLI default |
   | `MGKIT_PANEL_PI_MODEL` | `--model` for the pi seat, e.g. `zai/glm-5.3` | CLI default |
+  | `MGKIT_PANEL_PI_FALLBACK_MODEL` | Model for one retry when the pi seat fails for any reason but the timeout (rate limit, quota, auth), e.g. `xai/grok-4.7` | no retry |
+  | `MGKIT_PANEL_PI_EXTENSIONS` | Space-separated pi extension paths to load, e.g. one that provides a model's provider; a leading `~/` is allowed | none: every extension stays off |
   | `MGKIT_PANEL_TIMEOUT` | Seconds before a seat is stopped | none: a review takes the time it needs |
 
 - **Availability:** run `bash <script> seats --driver <you>`. Every line reads `seat<TAB>available|skipped<TAB>model or reason`. With at least one `available` seat, the panel runs. With none, say "Panel: no other seat available (<reasons>)" and do the review without a panel, as the calling skill describes.

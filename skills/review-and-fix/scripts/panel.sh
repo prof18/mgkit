@@ -7,7 +7,7 @@
 # Exit codes: 0 at least one seat returned a review, 2 usage error, 3 no seat returned a review.
 set -euo pipefail
 
-KNOWN_KEYS="MGKIT_PANEL_SEATS MGKIT_PANEL_CLAUDE_MODEL MGKIT_PANEL_CODEX_MODEL MGKIT_PANEL_PI_MODEL MGKIT_PANEL_TIMEOUT"
+KNOWN_KEYS="MGKIT_PANEL_SEATS MGKIT_PANEL_CLAUDE_MODEL MGKIT_PANEL_CODEX_MODEL MGKIT_PANEL_PI_MODEL MGKIT_PANEL_PI_FALLBACK_MODEL MGKIT_PANEL_PI_EXTENSIONS MGKIT_PANEL_TIMEOUT"
 
 usage() {
   echo "usage: panel.sh seats --driver NAME | panel.sh run --driver NAME --prompt-file FILE --out-dir DIR [--repo DIR]" >&2
@@ -77,14 +77,45 @@ exec_seat() {
     pi)
       args=(-p --tools read,grep,find,ls --no-extensions --no-skills --no-session --no-approve --offline)
       if [ -n "${MGKIT_PANEL_PI_MODEL:-}" ]; then args+=(--model "$MGKIT_PANEL_PI_MODEL"); fi
+      # Only the extensions the user names load (e.g. one that provides a model provider); --tools still
+      # keeps any tool they add out of the seat's reach.
+      if [ -n "${MGKIT_PANEL_PI_EXTENSIONS:-}" ]; then
+        local exts=() ext
+        read -r -a exts <<<"$MGKIT_PANEL_PI_EXTENSIONS"
+        for ext in "${exts[@]}"; do
+          case "$ext" in '~/'*) ext="$HOME/${ext#'~/'}" ;; esac
+          args+=(-e "$ext")
+        done
+      fi
       exec pi "${args[@]}" <"$prompt" >"$out/$seat.md" 2>"$out/$seat.log"
       ;;
   esac
 }
 
+# seat_job SEAT PROMPT OUT: runs one seat. When pi fails for any reason but the timeout (a rate limit, quota or
+# auth error makes it exit non-zero with an empty review), it runs once more with MGKIT_PANEL_PI_FALLBACK_MODEL.
+# The CLI runs as a child, and a TERM from the timeout watcher is passed on to it.
+seat_job() {
+  local seat="$1" prompt="$2" out="$3" child="" rc=0
+  trap '[ -z "$child" ] || kill -TERM "$child" 2>/dev/null; exit 143' TERM
+  (exec_seat "$seat" "$prompt" "$out") &
+  child=$!
+  wait "$child" || rc=$?
+  if [ "$seat" != pi ] || [ -z "${MGKIT_PANEL_PI_FALLBACK_MODEL:-}" ] || [ -e "$out/$seat.timeout" ]; then return "$rc"; fi
+  if [ "$rc" -eq 0 ] && grep -q '[^[:space:]]' "$out/$seat.md" 2>/dev/null; then return 0; fi
+  mv "$out/$seat.log" "$out/$seat.primary.log"
+  printf '%s\texit %s: %s\n' "$MGKIT_PANEL_PI_FALLBACK_MODEL" "$rc" \
+    "$(tr '\n' ' ' <"$out/$seat.primary.log" | cut -c1-200)" >"$out/$seat.fallback"
+  rc=0
+  (MGKIT_PANEL_PI_MODEL="$MGKIT_PANEL_PI_FALLBACK_MODEL"; exec_seat "$seat" "$prompt" "$out") &
+  child=$!
+  wait "$child" || rc=$?
+  return "$rc"
+}
+
 run_panel() {
   local driver="$1" prompt="$2" out="$3" repo="$4" timeout="${MGKIT_PANEL_TIMEOUT:-}"
-  local seats=() pids=() watchers=() seat status detail i rc ok=0 line
+  local seats=() pids=() watchers=() seat status detail i rc ok=0 line fb_model fb_reason model
   case "$timeout" in '' | *[!0-9]* | 0) [ -z "$timeout" ] || usage ;; esac
   mkdir -p "$out"
   : >"$out/status.tsv"
@@ -100,10 +131,12 @@ run_panel() {
     return 3
   fi
   for seat in "${seats[@]}"; do
-    rm -f "$out/$seat.md" "$out/$seat.log" "$out/$seat.timeout"
-    (cd "$repo" && exec_seat "$seat" "$prompt" "$out") &
+    rm -f "$out/$seat.md" "$out/$seat.log" "$out/$seat.timeout" "$out/$seat.fallback" "$out/$seat.primary.log"
+    (cd "$repo" && seat_job "$seat" "$prompt" "$out") &
     pids+=("$!")
-    printf 'started %s (model: %s, log: %s)\n' "$seat" "$(seat_model "$seat")" "$out/$seat.log"
+    model="$(seat_model "$seat")"
+    if [ "$seat" = pi ] && [ -n "${MGKIT_PANEL_PI_FALLBACK_MODEL:-}" ]; then model="$model, fallback: $MGKIT_PANEL_PI_FALLBACK_MODEL"; fi
+    printf 'started %s (model: %s, log: %s)\n' "$seat" "$model" "$out/$seat.log"
     if [ -n "$timeout" ]; then
       # Detached from our stdout/stderr, so a sleep that outlives a fast seat never holds a caller's pipe open.
       (sleep "$timeout" && : >"$out/$seat.timeout" && kill -TERM "${pids[${#pids[@]}-1]}") </dev/null >/dev/null 2>&1 &
@@ -124,6 +157,10 @@ run_panel() {
       status=failed; detail="exit $rc, see $out/$seat.log"
     else
       status=failed; detail="empty review, see $out/$seat.log"
+    fi
+    if [ -e "$out/$seat.fallback" ]; then
+      IFS=$'\t' read -r fb_model fb_reason <"$out/$seat.fallback" || true
+      detail="$detail (fallback $fb_model after $fb_reason)"
     fi
     printf '%s\t%s\t%s\n' "$seat" "$status" "$detail" >>"$out/status.tsv"
   done

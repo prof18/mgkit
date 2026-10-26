@@ -48,10 +48,12 @@ Seats use each CLI's default model; the Codex seat skips your `config.toml` so i
 ```
 MGKIT_PANEL_SEATS=claude codex pi
 MGKIT_PANEL_PI_MODEL=zai/glm-5.3
+MGKIT_PANEL_PI_FALLBACK_MODEL=xai/grok-4.7
+MGKIT_PANEL_PI_EXTENSIONS=
 MGKIT_PANEL_TIMEOUT=
 ```
 
-Seats have no time limit unless `MGKIT_PANEL_TIMEOUT` (seconds) is set. With no other CLI installed, both skills review on their own as before. The panel's round cap takes inspiration from [hamen/ship-feature](https://github.com/hamen/ship-feature).
+When the pi seat fails, for example on a rate limit, it runs once more with `MGKIT_PANEL_PI_FALLBACK_MODEL`, and the report names the fallback and why it was needed. The pi seat runs with every extension off; list in `MGKIT_PANEL_PI_EXTENSIONS` the ones it needs, such as an extension that provides a model's provider. Seats have no time limit unless `MGKIT_PANEL_TIMEOUT` (seconds) is set. With no other CLI installed, both skills review on their own as before. The panel's round cap takes inspiration from [hamen/ship-feature](https://github.com/hamen/ship-feature).
 
 ## Install
 
