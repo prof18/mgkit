@@ -4,6 +4,8 @@ All notable changes to mgkit. Versions stay 0.0.x until the toolkit is declared 
 
 ## [Unreleased]
 
+## [0.0.6] - 2026-10-27
+
 ### Added
 
 - Review panel for `plan-review` and `review-and-fix`: the other installed agent CLIs (Claude Code, Codex, Pi) review read-only next to the driving agent, then up to 3 driver-moderated rounds settle the findings. Code-review findings and decisions appear per author in Difftray. Seats and models are set in `~/.config/mgkit/panel.conf`, including a fallback model for the pi seat when its model is rate-limited and the pi extensions it may load.
