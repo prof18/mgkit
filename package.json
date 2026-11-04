@@ -1,6 +1,6 @@
 {
   "name": "mgkit",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "An opinionated toolkit for building software with AI agents: roast, plan, execute, review, ship.",
   "license": "MIT",
   "author": {
