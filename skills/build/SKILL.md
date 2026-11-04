@@ -1,6 +1,6 @@
 ---
 name: build
-description: "Run the full mgkit pipeline for a feature: plan it, review the plan, stop for the user to check the plan, then execute it and run review-and-fix, stopping at the end for the user's code review. Use whenever the user starts a request with build (build this, build: add X), asks to take a feature end to end, or to run the whole pipeline. Never implement such a request directly; the plan checkpoint comes first."
+description: "Run the full mgkit pipeline for a feature: plan it, review the plan, stop for the user to check the plan, then execute it (execute-plan ends with a repeating review-and-fix on the whole change), stopping at the end for the user's code review. Use whenever the user starts a request with build (build this, build: add X), asks to take a feature end to end, or to run the whole pipeline. Never implement such a request directly; the plan checkpoint comes first."
 ---
 
 # Build
@@ -13,12 +13,12 @@ Every skill named below is read from this skill's directory by relative path (fo
 
 1. **Size.** Apply the size rule in `../plan/SKILL.md`. State the choice (`plan` or `plan-max`) with a one-line reason. If the request already names one, use it. Do not wait for a reply here; the user can override in their next message.
 2. **Plan.** Read `../plan/SKILL.md` or `../plan-max/SKILL.md` and follow it completely, including its questions round. If a roast file for this feature exists, use it. The stage ends with the plan path.
-3. **Plan review.** Read `../plan-review/SKILL.md` and follow it on the plan path. One pass.
+3. **Plan review.** Read `../plan-review/SKILL.md` and follow it on the plan path. It repeats passes on its own until one comes back clean.
 4. **Checkpoint A: the user checks the plan.** Stop. Show the plan path, the review report and any open USER TASKs. Ask the user to read the plan and reply "go", or to request changes. Apply requested changes to the plan and ask again. Never continue without an explicit go.
 5. **Execute.** Record the current commit hash (`git rev-parse HEAD`) as the base. Read `../execute-plan/SKILL.md` and follow it on the plan path.
    - Small plan: continue in this session.
    - Big plan: if this session runs under a goal or long-running mode, continue. Otherwise tell the user that starting a fresh long-running session with the kickoff line from `../plan-max/references/kickoff.md` is recommended, and continue here only if the user says so.
-6. **Final review.** Read `../review-and-fix/SKILL.md` and follow it on the whole change from the base commit to `HEAD`.
+6. **Final review.** execute-plan ends with its final review: review-and-fix on the whole change from its base commit to `HEAD`, repeating passes until one comes back clean. Do not run another one here. If execute-plan stopped before finishing, there is no final review yet; report that at checkpoint B.
 7. **Checkpoint B: the user reviews the code.** Stop. Report the plan path, the commit range (`<base>..HEAD`), the gate result, the review summary, and remaining USER TASKs and blockers. Do not push, merge or open pull requests.
 
 ## 2. Resuming
@@ -27,7 +27,7 @@ When invoked with a plan path that already exists, work out the stage and say wh
 
 - No plan review has happened in this conversation: resume at stage 3.
 - The user already said "go" and tasks or steps remain: resume at stage 5.
-- Every task is done: resume at stage 6.
+- Every task is done but `TODO.md` has no final review log line (or, for a single-file plan, no final review happened in this conversation): run execute-plan's final review (its section 5), then checkpoint B.
 
 Ask for confirmation before continuing past a checkpoint that was not explicitly passed in this conversation.
 

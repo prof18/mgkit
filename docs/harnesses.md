@@ -211,8 +211,8 @@ Pi 1.2.0 in text mode turns an API error (rate limit, quota, bad key, unknown mo
 
 | Harness | Small plan (one file) | Big plan (folder) |
 |---|---|---|
-| Claude Code | `/mgkit:execute-plan plan/<date>-<slug>.html` | `/goal Use the mgkit execute-plan skill on plan/<date>-<slug>/ until every task in TODO.md that is not a USER TASK is checked or blocked.` |
-| Codex | `$execute-plan plan/<date>-<slug>.html` | `/goal Use $execute-plan on plan/<date>-<slug>/ until every task in TODO.md that is not a USER TASK is checked or blocked.` |
+| Claude Code | `/mgkit:execute-plan plan/<date>-<slug>.html` | `/goal Use the mgkit execute-plan skill on plan/<date>-<slug>/ until every task in TODO.md that is not a USER TASK is checked or blocked, and the final review has run once every such task is checked.` |
+| Codex | `$execute-plan plan/<date>-<slug>.html` | `/goal Use $execute-plan on plan/<date>-<slug>/ until every task in TODO.md that is not a USER TASK is checked or blocked, and the final review has run once every such task is checked.` |
 | OpenCode | `Use the execute-plan skill on plan/<date>-<slug>.html` | `Use the execute-plan skill on plan/<date>-<slug>/` (no goal mode: the skill keeps looping itself) |
 | Pi | `/skill:execute-plan plan/<date>-<slug>.html` | `/skill:execute-plan plan/<date>-<slug>/` (no goal mode: the skill keeps looping itself) |
 

@@ -1,6 +1,6 @@
 ---
 name: execute-plan
-description: "Implement an existing plan written by plan or plan-max. A single HTML plan file is executed in one run; a plan folder is worked through TODO.md task by task until done, under a long-running goal when the harness has one. Enforces test-first changes, a green gate, review-and-fix before committing, explicit staging, and never pushing. Use whenever the user says execute the plan, implement the plan, continue the plan or run the plan, with or without a path: the skill finds plans under plan/ itself and reports when there is none."
+description: "Implement an existing plan written by plan or plan-max. A single HTML plan file is executed in one run; a plan folder is worked through TODO.md task by task until done, under a long-running goal when the harness has one. Enforces test-first changes, a green gate, a single review-and-fix pass before each commit and a repeating review-and-fix on the whole change at the end, explicit staging, and never pushing. Use whenever the user says execute the plan, implement the plan, continue the plan or run the plan, with or without a path: the skill finds plans under plan/ itself and reports when there is none."
 ---
 
 # Execute Plan
@@ -19,7 +19,7 @@ Implement a plan exactly as written, with commits sized for feature scope and re
 3. Code samples in HTML plans are escaped. Decode `&lt;`, `&gt;` and `&amp;` when transcribing.
 4. Test first for every behaviour change: write the test, run it and watch it fail, implement, run it and watch it pass.
 5. Run the plan's gate command before every commit. Never commit on a red gate. Never weaken, skip or delete tests to get green.
-6. Review before committing: read `../review-and-fix/SKILL.md` (relative to this skill's directory; if that path cannot be resolved, find `skills/review-and-fix/SKILL.md` in the mgkit installation) and follow it on the staged change. Do this before every commit, including intermediate commits.
+6. Review before committing: read `../review-and-fix/SKILL.md` (relative to this skill's directory; if that path cannot be resolved, find `skills/review-and-fix/SKILL.md` in the mgkit installation) and follow it on the staged change as a single pass. Do this before every commit, including intermediate commits. The repeating review runs once, on the whole change, in the final review (section 5).
 7. Stage explicit paths only. Never run `git add -A`, `git add .` or `git commit -a`. Never stage anything under `plan/` or wherever the plan lives. Run `git status --short` before every commit.
 8. Never push, never add remotes, never publish, unless the user explicitly asks in this conversation.
 9. Never edit the plan, except `TODO.md` in loop mode.
@@ -27,13 +27,15 @@ Implement a plan exactly as written, with commits sized for feature scope and re
 11. Never perform or self-certify a USER TASK.
 12. Prefer one implementation commit for a small, cohesive feature. Split only at meaningful, independently understandable boundaries that improve reviewability, readability, rollback safety, or separate distinct concerns. Larger work should use small, coherent commits where those boundaries provide value. Multiple steps or tasks alone do not justify multiple commits. Follow explicit commit groupings in the plan; otherwise state the grouping before implementation.
 13. Follow the repository's commit message convention; without one, use `<area>: <imperative summary>`.
+14. Record the base commit before the first change: `git rev-parse HEAD`. In loop mode, write it as `Base: <hash>` right under the title of `TODO.md` the first time you start, and reuse an existing `Base:` line when resuming.
 
 ## 3. Single-run mode (one HTML file)
 
 1. Execute the steps in order, keeping their tests and acceptance checks. Commit at the chosen boundaries, grouping all steps of a small, cohesive feature into one implementation commit by default.
 2. Before each commit, stage explicit paths, run the gate, and run review-and-fix on the staged change. For one commit, this reviews the full implementation.
 3. No goal mode is needed; do not ask for one.
-4. Finish with: steps done, commits (hash and subject), gate result, review summary, remaining USER TASKs.
+4. When every step is done, run the final review (section 5).
+5. Finish with: steps done, commits (hash and subject), gate result, review summary including the final review, remaining USER TASKs.
 
 ## 4. Loop mode (plan folder)
 
@@ -49,11 +51,20 @@ Implement a plan exactly as written, with commits sized for feature scope and re
    9. Repeat.
 2. At a milestone boundary, run the milestone acceptance checks before starting the next milestone. If they fail, fix that first.
 3. **Keep going.** If this session runs under a goal or long-running mode, the goal keeps you working. If it does not, keep looping yourself. Do not stop to ask whether to continue.
-4. Stop only when every task that is not a USER TASK is checked, when every remaining task is blocked or waits on a USER TASK, or when the context or budget is nearly used up.
+4. When every task that is not a USER TASK is checked, run the final review (section 5) before stopping. Stop only when that final review has run, when every remaining task is blocked or waits on a USER TASK, or when the context or budget is nearly used up.
 5. Before stopping for any reason, add one line under `## Log` in `TODO.md` (date, tasks done, blockers). Then report: progress (done out of total tasks), commits, blockers, pending USER TASKs, and the exact line to continue.
 6. When resuming, `TODO.md` is the only record of progress; trust it over memory of the conversation. Inspect any recorded uncommitted work before continuing; do not assume an unchecked task has no changes. Check that the last ticked task's commit exists (`git log --oneline`); if it doesn't, untick it and add a note.
 
-## 5. Harness notes
+## 5. Final review
+
+Run once, when the plan is finished: every step done in single-run mode, every task that is not a USER TASK checked in loop mode. Remaining USER TASKs do not hold it back. Skip it only when stopping with other tasks still unchecked (blocked, or out of context or budget); it runs when a later session finishes the plan. The session ledger from the per-commit reviews is its skip list, so its first pass spends its budget on new ground.
+
+1. Read `../review-and-fix/SKILL.md` and follow it on the whole change from the base commit to `HEAD`, with its default repeating passes (not single pass).
+2. Its fixes follow its commit policy: the reviewed work is committed, so it commits its fix batches, staging explicit paths and never `plan/`.
+3. In loop mode, add a `## Log` line in `TODO.md`: `<date> final review: <passes> passes, <fixed> fixed, stopped because <reason>`. When resuming a finished plan, a log line like that means the final review already ran; do not run it again unless the user asks.
+4. A caller such as `build` uses this final review as its own; it does not run another one.
+
+## 6. Harness notes
 
 - Claude Code and Codex have a native `/goal` mode; start big plans with it.
 - OpenCode and Pi have no goal mode; this skill keeps looping by itself, and running the same line again continues from `TODO.md`.

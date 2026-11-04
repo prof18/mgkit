@@ -4,6 +4,10 @@ All notable changes to mgkit. Versions stay 0.0.x until the toolkit is declared 
 
 ## [Unreleased]
 
+### Changed
+
+- `plan-review` and `review-and-fix` repeat passes on their own instead of asking you to re-run them. Another pass starts only when the last one fixed a medium-or-worse finding; `plan-review` stops after at most 4 passes and `review-and-fix` after 3, with one report for the whole run. Say "single pass" for the old behaviour. The per-commit reviews inside `execute-plan` stay single pass; `execute-plan` now ends with one repeating review-and-fix on the whole change from its base commit, which `build` uses as its final review. The big-plan `/goal` kickoff lines wait for that final review.
+
 ## [0.0.6] - 2026-10-27
 
 ### Added

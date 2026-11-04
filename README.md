@@ -27,9 +27,9 @@ roast ──▶ plan / plan-max ──▶ plan-review ──▶ [you check the p
 | `roast` | Critiques an idea, questions you in rounds until every decision is settled, hunts for a name, writes a roast file | You are about to start something new or want your requirements challenged |
 | `plan` | Writes a small feature plan as one standalone HTML file | The change is small and contained |
 | `plan-max` | Writes a plan folder: HTML index, one file per milestone, `TODO.md` | The work is big, multi-part, or spans sessions |
-| `plan-review` | Reviews a plan in one pass and fixes it in place | Before executing any plan |
-| `execute-plan` | Implements a small plan in one run, or a big plan task by task from `TODO.md` | A reviewed plan is ready |
-| `review-and-fix` | One bounded review pass: grade findings, fix only confirmed ones | Before a commit, a merge, or after a large change |
+| `plan-review` | Reviews a plan and fixes it in place, repeating passes until one comes back clean (at most 4) | Before executing any plan |
+| `execute-plan` | Implements a small plan in one run, or a big plan task by task from `TODO.md`, then runs a repeating review-and-fix on the whole change | A reviewed plan is ready |
+| `review-and-fix` | Bounded review passes that grade findings and fix only confirmed ones, repeating until one comes back clean (at most 3) | Before a commit, a merge, or after a large change |
 | `build` | Runs plan, plan-review, execute-plan and review-and-fix, stopping twice for you | You want a feature taken end to end |
 | `plan-to-docs` | Turns finished plans into present-tense docs written from the code, points `AGENTS.md` at them, and deletes the plans | A plan is done and should become documentation |
 | `explain-commit` | Visual walkthrough of a commit, range, PR or diff | You need to understand a change |

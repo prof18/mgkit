@@ -4,8 +4,8 @@ Replace `<path>` with the plan's real path. Big plans are folders (`plan/<date>-
 
 | Harness | Small plan | Big plan |
 |---|---|---|
-| Claude Code | `/mgkit:execute-plan <path>` | `/goal Use the mgkit execute-plan skill on <path> until every task in TODO.md that is not a USER TASK is checked or blocked.` |
-| Codex | `$execute-plan <path>` | `/goal Use $execute-plan on <path> until every task in TODO.md that is not a USER TASK is checked or blocked.` |
+| Claude Code | `/mgkit:execute-plan <path>` | `/goal Use the mgkit execute-plan skill on <path> until every task in TODO.md that is not a USER TASK is checked or blocked, and the final review has run once every such task is checked.` |
+| Codex | `$execute-plan <path>` | `/goal Use $execute-plan on <path> until every task in TODO.md that is not a USER TASK is checked or blocked, and the final review has run once every such task is checked.` |
 | OpenCode | `Use the execute-plan skill on <path>` | `Use the execute-plan skill on <path>` |
 | Pi | `/skill:execute-plan <path>` | `/skill:execute-plan <path>` |
 

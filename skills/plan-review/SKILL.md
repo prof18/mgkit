@@ -1,11 +1,11 @@
 ---
 name: plan-review
-description: Review an implementation plan, either a single-file plan or a multi-file plan folder, in one thorough pass and fix it in place. Checks consistency, security, performance, missing pieces, dark paths, anything a cheaper implementing agent could misread, API and tooling facts against current docs, and conformance to the roast decisions. Uses a panel of the other installed agent CLIs (Claude Code, Codex, Pi) for up to 3 rounds when available. Use when the user asks to review, validate, double-check or harden a plan, or before executing one.
+description: Review an implementation plan, either a single-file plan or a multi-file plan folder, and fix it in place, repeating passes on its own until a pass finds nothing of medium severity or worse (at most 4 passes; say single pass for one). Checks consistency, security, performance, missing pieces, dark paths, anything a cheaper implementing agent could misread, API and tooling facts against current docs, and conformance to the roast decisions. Uses a panel of the other installed agent CLIs (Claude Code, Codex, Pi) for up to 3 rounds when available. Use when the user asks to review, validate, double-check or harden a plan, or before executing one.
 ---
 
 # Plan Review
 
-Make a plan safe to hand to a cheaper agent: find what is wrong, missing or ambiguous, fix it in the plan, and report. One pass per invocation.
+Make a plan safe to hand to a cheaper agent: find what is wrong, missing or ambiguous, fix it in the plan, and repeat until a pass comes back clean. One invocation runs every pass the plan needs, up to the cap in section 4, so the user does not have to re-run the skill.
 
 ## 1. Target
 
@@ -14,7 +14,7 @@ Make a plan safe to hand to a cheaper agent: find what is wrong, missing or ambi
 - Read the repository's instruction files and the code the plan touches, enough to judge whether the plan fits reality.
 - If the plan is partly executed (ticked boxes in `TODO.md`, or commits that implement its steps), review only what is not executed yet. Never rewrite executed steps; report any conflict with executed work as a finding for the user.
 
-## 2. One pass through these lenses
+## 2. Each pass goes through these lenses
 
 | Lens | Look for |
 |---|---|
@@ -28,7 +28,7 @@ Make a plan safe to hand to a cheaper agent: find what is wrong, missing or ambi
 | Roast conformance | Every roast decision is reflected; no rejected option appears; open questions are resolved or turned into USER TASKs or verification steps. |
 | User focus | If the user named a focus ("API resilience", "security"), go deeper on it in addition to the lenses above. |
 
-Always do the whole pass yourself. Also read `../review-and-fix/references/panel.md` (relative to this skill's directory; if unresolvable, find `skills/review-and-fix/references/panel.md` in the mgkit installation) and check seat availability. With at least one other seat available, run panel round 1 on the plan while you do your pass, with the lenses above as the task and the plan path as the target. Keep the panel files and findings in the session scratch directory; plan reviews never use Difftray. Without a panel, if you can start subagents, you may split the lenses across at most 3 reviewers, each with a self-contained prompt; you merge, verify and decide.
+Always do the whole of every pass yourself. Also read `../review-and-fix/references/panel.md` (relative to this skill's directory; if unresolvable, find `skills/review-and-fix/references/panel.md` in the mgkit installation) and check seat availability. With at least one other seat available, run panel round 1 on the plan while you do your pass, with the lenses above as the task and the plan path as the target. Keep the panel files and findings in the session scratch directory; plan reviews never use Difftray. Without a panel, if you can start subagents, you may split the lenses across at most 3 reviewers, each with a self-contained prompt; you merge, verify and decide.
 
 ## 3. Grade and fix
 
@@ -44,20 +44,38 @@ Always do the whole pass yourself. Also read `../review-and-fix/references/panel
   ➡️ <recommended answer and one-sentence reason>
   ```
 
-  Apply the answers, then finish.
+  Apply the answers, then go on to section 4.
 - Keep HTML code samples escaped. Do not commit plan files.
 
-## 4. Report
+## 4. Passes
+
+A pass is sections 2 and 3 once: every lens, the panel when available (its own rounds 1 to 3), grading, fixes and questions.
+
+- Keep a findings ledger for this plan in the session scratch or temp directory, never in the repository: one line per finding with its pass, status (`fixed`, `rejected`, `discarded`, `question`), severity, location and a few words. From the second pass on, give it to yourself and every panel seat as the skip list: a finding matching a `rejected` or `discarded` entry is dropped unless that part of the plan changed since; one matching a `fixed` entry means the fix was wrong and gets priority.
+- Later passes cover the whole plan again, but look first at what the previous pass changed and at lenses or files the earlier passes covered least. Each pass starts its panel at round 1.
+- After each pass, decide:
+  - **Continue** when the pass fixed at least one critical, high or medium finding.
+  - **Stop, clean** when it fixed none: only low findings, or nothing.
+  - **Stop, cap** after the fourth pass in any case.
+  Open questions do not stop the loop: ask them at the end of the pass that raised them, apply the answers, then decide.
+- Between passes, say in one line what the pass fixed and that the next one is starting. Do not wait for a reply.
+- If the user asked for a single pass ("single pass", "one pass", "just once"), run one pass and stop.
+
+## 5. Report
+
+One report for the whole run, after the last pass:
 
 ```
 ## Plan review — <path>
+Passes: <n> · stopped because: <clean pass | cap reached | single pass requested>
+Per pass: 1: <fixed n (c/h/m/l)> · 2: … 
 Fixed: <n> · Needs decision: <n> · Discarded: <n>
-<panel lines from section 5 of panel.md, when a panel ran>
+<panel lines from section 5 of panel.md for each pass that ran a panel>
 
-| # | Severity | Lens | Where | Finding | Action |
-|---|---|---|---|---|---|
+| # | Pass | Severity | Lens | Where | Finding | Action |
+|---|---|---|---|---|---|---|
 
 Sources checked: <links or commands>
 ```
 
-End with: "One pass done. Run plan-review again for another pass." Never start a second pass on your own.
+When the cap stopped the loop and the last pass still fixed a medium or worse finding, say so in one line: the plan may need another run, or a rethink of the part that keeps producing findings. Never end by asking the user to run plan-review again otherwise.

@@ -1,13 +1,13 @@
 ---
 name: review-and-fix
-description: "Run a budget-conscious, agent-assisted codebase review and remediation pass. Use when the user asks to review and fix, run a code review pass, or review a whole repository, branch, PR, or large change set for bugs, performance issues, accessibility problems, build/release risks, or general quality problems; to split review work across subagents; to grade, filter, and fix validated findings; or to run another review pass. Defaults: one review pass by a panel of the other installed agent CLIs (Claude Code, Codex, Pi) moderated by the main agent for up to 3 rounds, with findings shown per author in Difftray when it is available, or by 1-3 mid-tier reviewer subagents when no other CLI is installed; main-agent verification and grading, a single fix worker, then stop. Further passes run only when the user asks, and reuse the session findings ledger."
+description: "Run a budget-conscious, agent-assisted codebase review and remediation loop. Use when the user asks to review and fix, run a code review pass, or review a whole repository, branch, PR, or large change set for bugs, performance issues, accessibility problems, build/release risks, or general quality problems; to split review work across subagents; to grade, filter, and fix validated findings; or to run another review pass. Defaults: each review pass is done by a panel of the other installed agent CLIs (Claude Code, Codex, Pi) moderated by the main agent for up to 3 rounds, with findings shown per author in Difftray when it is available, or by 1-3 mid-tier reviewer subagents when no other CLI is installed; main-agent verification and grading, a single fix worker. Passes repeat on their own while a pass still fixes a medium-or-worse finding, at most 3, reusing the session findings ledger; say single pass for one."
 ---
 
 # Review and Fix
 
-Turn a broad "review everything and fix what matters" request into one bounded review/grade/fix pass. The goal is a short list of concrete, verified, important defects that get fixed, not a giant speculative audit. Low-confidence and unimportant findings are filtered out before any fix work starts.
+Turn a broad "review everything and fix what matters" request into bounded review/grade/fix passes that repeat until one comes back clean. The goal is a short list of concrete, verified, important defects that get fixed, not a giant speculative audit. Low-confidence and unimportant findings are filtered out before any fix work starts.
 
-The user starts additional passes explicitly. Each pass reuses the session findings ledger so it spends its budget on new ground.
+One invocation runs every pass the change needs, up to the cap in Passes, so the user does not have to re-run the skill. Each pass reuses the session findings ledger so it spends its budget on new ground.
 
 ## Agent Budget
 
@@ -18,7 +18,7 @@ Subagents are expensive. Spawn only the agents a step actually needs.
 - **Reviewer model:** mid-tier. Reviewers optimize for recall; the main agent provides precision.
 - **Verification:** done by the main agent. Spawn one verifier agent for the whole batch only when merged findings exceed ~10. Never spawn one verifier per finding.
 - **Fix workers:** 1 on a mid or small model. Use 2 only when fixes touch fully disjoint modules. The main agent makes trivial one-line fixes directly.
-- **No default second pass**, full or narrow. Fix correctness is covered by the main agent's diff review plus tests and gate.
+- **Passes stop early.** A further pass runs only when the previous one fixed a medium-or-worse finding (see Passes), never to re-check fixes: fix correctness is covered by the main agent's diff review plus tests and gate.
 - Launch every subagent with fresh context (no inherited conversation, e.g. `fork_turns="none"`) and a self-contained prompt.
 - If subagents are unavailable, say so briefly and run the same steps locally.
 
@@ -50,7 +50,7 @@ F5  escalate   Db schema         correctness/high   needs migration decision fro
 
 Statuses: `fixed`, `rejected` (verified false), `discarded` (low confidence or below threshold), `follow-up` (real but not fixed), `escalate` (needs a user decision).
 
-When the user asks for another pass in the same session, pass the ledger to reviewers as the skip list. A finding matching a `rejected` or `discarded` entry is dropped without re-verification unless the code changed. A finding matching a `fixed` entry is a regression and gets priority.
+From the second pass on, and whenever the user asks for another run in the same session, pass the ledger to reviewers as the skip list. A finding matching a `rejected` or `discarded` entry is dropped without re-verification unless the code changed. A finding matching a `fixed` entry is a regression and gets priority.
 
 ## Grading Rubric
 
@@ -156,17 +156,26 @@ On release, beta, hotfix, signing, notarization, packaging, or store-submission 
 
 7. **Panel rounds.** With a panel, run rounds 2 and 3 as `references/panel.md` describes, on your dispositions and the fix diff. Objections you accept and new critical or high findings go through steps 4-6 again. Stop by its stop rule; never run a fourth round.
 
-8. **Report and stop.** Do not start another pass unless the user asks.
+8. **Decide.** Apply the stop rule in Passes. To continue, say in one line what this pass fixed and start the next pass at step 1, without waiting for a reply. To stop, write the Final Report.
 
-## Additional Passes (user-requested)
+## Passes
 
-When the user asks for another pass:
+A pass is Workflow steps 1-7 once. After each pass:
 
-- Re-baseline with `git status --short`.
-- Reuse the session ledger as the skip list; tell reviewers to prioritize areas not already covered.
-- Follow the same Agent Budget and Workflow.
-- A new pass starts its own panel at round 1, with the ledger as the skip list.
-- If the user asks for a "deep" or parallel review (e.g. two models on the same baseline), merge all reviewer output before verification.
+- **Continue** when the pass fixed at least one CONFIRMED critical, high or medium finding.
+- **Stop, clean** when it fixed none: everything was low, follow-up, escalated, rejected or discarded, or nothing was found.
+- **Stop, cap** after the third pass in any case.
+- **Stop, blocked** when the gate stays red after the fix step, or a finding escalated in this pass blocks further review of the same code. Report the blocker.
+
+For each pass after the first:
+
+- Re-baseline with `git status --short`; the target is the same, now including the earlier fixes.
+- Reuse the session ledger as the skip list; tell reviewers to look first at code the previous pass changed and at areas not already covered.
+- Follow the same Agent Budget. A new pass starts its own panel at round 1, with the ledger as the skip list.
+
+**Single pass.** Run one pass and stop when the user asks for it ("single pass", "one pass", "just once"), or when another skill calls this one for a per-commit review and says single pass.
+
+If the user asks for a "deep" or parallel review (e.g. two models on the same baseline), merge all reviewer output before verification.
 
 ## Long-Running Reviews
 
@@ -202,8 +211,9 @@ Report changed files, tests added, and commands run with results.
 
 ## Final Report
 
-Keep it concise:
+One report for the whole run, after the last pass. Keep it concise:
 
+- Passes run and why the loop stopped (clean pass, cap reached, blocked, single pass requested), with the fixed count per pass. When the cap stopped it and the last pass still fixed a medium or worse finding, say so in one line.
 - Agents used (reviewers, verifier if any, workers), and the panel lines from section 5 of `references/panel.md` when a panel ran.
 - Findings funnel: reported -> merged -> fixed / follow-up / escalate / rejected / discarded (counts).
 - Fixed findings, one line each, with commit or "left uncommitted".
