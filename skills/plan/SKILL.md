@@ -45,6 +45,8 @@ Prefer one implementation commit for a small, cohesive feature. Split only at me
 
 - Save the plan to `plan/<YYYY-MM-DD>-<slug>.html` at the repository root, unless the user's instructions specify another location. Use today's date and a slug of 2 to 5 lowercase ASCII words joined by hyphens. Never overwrite an existing plan; pick a different slug.
 - Create `plan/` if it does not exist. Do not add it to any ignore file. Do not commit the plan.
-- Start from `templates/plan.html`. Replace `{{head}}` with the full contents of `templates/_head.html`. Fill every other `{{placeholder}}`, repeat blocks (context items, decisions, constants, steps) as needed, and delete a section only when it would be empty (Constants may be omitted when there are none).
-- HTML-escape every code sample (`<` as `&lt;`, `>` as `&gt;`, `&` as `&amp;`).
-- Before presenting, confirm no placeholder is left: searching the file for `{{` must find nothing.
+- Read `templates/components.html` once. It lists every component and its markup. Do not read `templates/_head.html`; the script adds it.
+- Write only the page body to `<plan path>.body` (for example `plan/2026-11-05-foo.html.body`), starting from `templates/plan.html`, which is a body fragment. Fill every `{{placeholder}}`, repeat blocks (context items, decisions, constants, steps) as needed, and delete a section only when it would be empty (Constants may be omitted when there are none).
+- Build the body from the catalog's components. Where none fits, use plain `p`, lists, `table` or `pre > code` without a class. Never write `<style>`, `style=`, `<script>`, a class the catalog does not list, or a document shell (`<!doctype>`, `<html>`, `<head>`, `<body>`).
+- HTML-escape every code sample (`<` as `&lt;`, `>` as `&gt;`, `&` as `&amp;`). Write a literal `{{` inside a code sample as `&#123;&#123;`.
+- Assemble with the script `scripts/assemble-plan.sh` in this skill's directory. Resolve its absolute path from this skill's directory (if you cannot, search for `skills/plan/scripts/assemble-plan.sh` inside the mgkit installation) and run, from the repository root, `bash <absolute script path> <plan path> "<title>"`. It checks the body, writes the plan and deletes the `.body` file. If it prints `FAIL`, fix the body file and run it again. Never edit or bypass the script.

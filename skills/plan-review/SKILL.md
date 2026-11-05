@@ -46,6 +46,7 @@ Always do the whole of every pass yourself. Also read `../review-and-fix/referen
 
   Apply the answers, then go on to section 4.
 - Keep HTML code samples escaped. Do not commit plan files.
+- Keep plan markup to the components in `../plan/templates/components.html`. Never add `<style>`, `style=` or `<script>`. After editing, run `bash <script> --check <every edited .html file>` and fix every `FAIL`, where `<script>` is the absolute path of `../plan/scripts/assemble-plan.sh` resolved from this skill's directory (if you cannot resolve it, search for `skills/plan/scripts/assemble-plan.sh` inside the mgkit installation).
 
 ## 4. Passes
 

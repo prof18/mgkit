@@ -4,6 +4,10 @@ All notable changes to mgkit. Versions stay 0.0.x until the toolkit is declared 
 
 ## [Unreleased]
 
+### Changed
+
+- `plan` and `plan-max` build plans from a fixed component catalog (steps, tasks, decisions, user tasks, file lists, diffs, callouts, out-of-scope lists, static SVG diagrams). The agent writes only the page body; the bundled bash script `skills/plan/scripts/assemble-plan.sh` adds the shared stylesheet, checks for leftover placeholders, inline styles, scripts or external resources, unknown classes and steps missing a required part, then writes the file. The planning agent no longer reads or writes the stylesheet, so plans cost fewer tokens and look the same everywhere. `plan-review` runs the same checks after editing a plan.
+
 ## [0.0.8] - 2026-11-05
 
 ### Added

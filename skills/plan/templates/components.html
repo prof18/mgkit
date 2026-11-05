@@ -1,0 +1,42 @@
+<!-- mgkit plan component catalog. Use only these classes. Where no component fits, use plain p, ul, ol, table or pre > code without a class. -->
+<!-- Byline: <p class="muted">. Escaping note: <p class="rule">. Both are already in the templates. -->
+
+<!-- step (small plans): every part required; "Test first:" may say "none, because <reason>" -->
+<section class="step" id="S1">
+<h3>☐ 1. Add the parser</h3>
+<p><strong>Files:</strong> <code>src/parse.ts</code></p>
+<p><strong>Test first:</strong> <code>test/parse.test.ts</code> asserts empty input returns []. Run: <code>npm test</code></p>
+<p><strong>Do:</strong> exact instructions.</p>
+<p><strong>Gate:</strong> <code>npm run check</code></p>
+<p><strong>Acceptance:</strong> <code>npm test</code> passes.</p>
+</section>
+
+<!-- task (plan-max milestones): same as step without Gate; id matches TODO.md -->
+<section class="task" id="T1.1">
+<h3>T1.1 — Add the parser</h3>
+<p><strong>Files:</strong> …</p>
+<p><strong>Test first:</strong> …</p>
+<p><strong>Do:</strong> …</p>
+<p><strong>Acceptance:</strong> …</p>
+</section>
+
+<div class="decision"><p><strong>Decision:</strong> store dates as ISO strings.</p><p><strong>Why:</strong> the API already returns them.</p></div>
+
+<div class="user-task"><p><strong>USER TASK:</strong> sign in on the device and confirm the banner shows.</p></div>
+
+<ul class="files"><li><code>src/parse.ts</code> — parses the feed</li></ul>
+
+<pre class="diff"><code><span class="del">- const limit = 10</span>
+<span class="add">+ const limit = LIMIT</span>
+  return items</code></pre>
+
+<div class="callout note"><p>Context the reader must not miss.</p></div>
+<div class="callout warn"><p>A trap the implementer could fall into.</p></div>
+
+<ul class="out-of-scope"><li>Do not touch the sync code.</li></ul>
+
+<!-- diagram: only when a flow or structure is hard to follow in prose. Static SVG, colours via currentColor only. -->
+<figure class="diagram">
+<svg viewBox="0 0 320 60" role="img" aria-label="request flows from app to API"><rect x="1" y="15" width="90" height="30" fill="none" stroke="currentColor"/><text x="46" y="35" text-anchor="middle" fill="currentColor">app</text><path d="M91 30H229" stroke="currentColor"/><rect x="229" y="15" width="90" height="30" fill="none" stroke="currentColor"/><text x="274" y="35" text-anchor="middle" fill="currentColor">API</text></svg>
+<figcaption>Request flow.</figcaption>
+</figure>

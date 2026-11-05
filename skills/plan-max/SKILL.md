@@ -46,7 +46,7 @@ Read the size rule in `../plan/SKILL.md` (relative to this skill's directory; if
 | `TODO.md` | `templates/TODO.md` | Every task, in order, with ids `T<milestone>.<n>` matching the milestone files |
 | `LOCAL.md` | `templates/LOCAL.md` | Only when machine-specific values are needed (paths, device ids, where env files live). Never secrets, only where to find them |
 
-For every HTML file: replace `{{head}}` with the full contents of `../plan/templates/_head.html`, fill every other `{{placeholder}}`, repeat blocks as needed, and HTML-escape code samples (`<` as `&lt;`, `>` as `&gt;`, `&` as `&amp;`). When done, searching the folder for `{{` must find nothing.
+For every HTML file: read `../plan/templates/components.html` (relative to this skill's directory) once for the whole plan and follow the component and escaping rules in the Output section of `../plan/SKILL.md`. The templates here are body fragments. Write each file's body to `<file>.body`. Assemble it with the script `../plan/scripts/assemble-plan.sh`, resolved to an absolute path from this skill's directory (if you cannot, search for `skills/plan/scripts/assemble-plan.sh` inside the mgkit installation): run `bash <absolute script path> <file> "<title>"` from the repository root, using these titles: `INDEX.html` → `<plan title>`, `00-conventions.html` → `<plan title>: conventions`, `NN-<topic>.html` → `<plan title>: M<n> <milestone title>`.
 
 ## Writing milestones and tasks
 
