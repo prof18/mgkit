@@ -4,6 +4,10 @@ All notable changes to mgkit. Versions stay 0.0.x until the toolkit is declared 
 
 ## [Unreleased]
 
+### Added
+
+- `quick`: do a small, clear change without a plan. It states the change in one line, implements it test first behind the gate, commits, runs a repeating review-and-fix on the whole change and stops for your code review. It stops and recommends `build` when the change turns out bigger or needs a decision. `build` mentions `quick` when the change it is asked for is tiny.
+
 ## [0.0.7] - 2026-11-04
 
 ### Changed

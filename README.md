@@ -31,6 +31,7 @@ roast ──▶ plan / plan-max ──▶ plan-review ──▶ [you check the p
 | `execute-plan` | Implements a small plan in one run, or a big plan task by task from `TODO.md`, then runs a repeating review-and-fix on the whole change | A reviewed plan is ready |
 | `review-and-fix` | Bounded review passes that grade findings and fix only confirmed ones, repeating until one comes back clean (at most 3) | Before a commit, a merge, or after a large change |
 | `build` | Runs plan, plan-review, execute-plan and review-and-fix, stopping twice for you | You want a feature taken end to end |
+| `quick` | Implements a small, clear change without a plan (test first, gate, commit), then runs a repeating review-and-fix and stops for you; hands off to `build` if the change grows | The change is easy and a plan would cost more than the work |
 | `plan-to-docs` | Turns finished plans into present-tense docs written from the code, points `AGENTS.md` at them, and deletes the plans | A plan is done and should become documentation |
 | `explain-commit` | Visual walkthrough of a commit, range, PR or diff | You need to understand a change |
 | `worktree-task` | Does a task in an isolated Git worktree, merges it back, cleans up | You want work isolated from your checkout |
