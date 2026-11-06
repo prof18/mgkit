@@ -4,6 +4,8 @@ All notable changes to mgkit. Versions stay 0.0.x until the toolkit is declared 
 
 ## [Unreleased]
 
+## [0.0.10] - 2026-11-06
+
 ### Added
 
 - `squash`: tidies a branch's unpublished commits into the shape that reads best. Review and test fixes fold into the commit they fix, separate concerns stay separate commits, a small cohesive change becomes one commit, and the final tree is checked to be identical. It never pushes and refuses commits that are already on a remote.
