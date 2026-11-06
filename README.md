@@ -32,6 +32,8 @@ roast ──▶ plan / plan-max ──▶ plan-review ──▶ [you check the p
 | `review-and-fix` | Bounded review passes that grade findings and fix only confirmed ones, repeating until one comes back clean (at most 3) | Before a commit, a merge, or after a large change |
 | `build` | Runs plan, plan-review, execute-plan and review-and-fix, stopping twice for you | You want a feature taken end to end |
 | `quick` | Implements a small, clear change without a plan (test first, gate, commit), then runs a repeating review-and-fix and stops for you; hands off to `build` if the change grows | The change is easy and a plan would cost more than the work |
+| `squash` | Tidies a branch's commits into the shape that reads best: fixes fold into the commit they fix, separate concerns stay separate, the code stays identical | Review left fix commits on top of the work |
+| `land` | Fast-forwards the primary checkout to a worktree branch (rebasing and rerunning the gate if needed), removes the worktree and branch, marks the ticket done | You approved the code and want it merged locally |
 | `plan-to-docs` | Turns finished plans into present-tense docs written from the code, points `AGENTS.md` at them, and deletes the plans | A plan is done and should become documentation |
 | `explain-commit` | Visual walkthrough of a commit, range, PR or diff | You need to understand a change |
 | `worktree-task` | Does a task in an isolated Git worktree, merges it back, cleans up | You want work isolated from your checkout |

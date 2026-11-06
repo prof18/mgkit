@@ -4,6 +4,12 @@ All notable changes to mgkit. Versions stay 0.0.x until the toolkit is declared 
 
 ## [Unreleased]
 
+### Added
+
+- `squash`: tidies a branch's unpublished commits into the shape that reads best. Review and test fixes fold into the commit they fix, separate concerns stay separate commits, a small cohesive change becomes one commit, and the final tree is checked to be identical. It never pushes and refuses commits that are already on a remote.
+- `land`: finishes work from a Git worktree. It fast-forwards the primary checkout's branch (rebasing the task branch and rerunning the gate when the target moved on), removes the worktree and its merged branch without force, and marks the ticket the work came from as done, asking first for hosted trackers. It never pushes.
+- `quick` and `build` mention `squash` and `land` at their final checkpoint.
+
 ## [0.0.9] - 2026-11-05
 
 ### Changed

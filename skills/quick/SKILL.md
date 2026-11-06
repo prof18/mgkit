@@ -28,7 +28,7 @@ If it does not fit, stop without changing anything. Say which condition failed i
 4. **Implement.** Follow rules 4, 5, 7, 8 and 13 of `../execute-plan/SKILL.md` section 2: test first for every behaviour change, a green gate before committing without weakening tests, explicit staging, never pushing, and the repository's commit message convention. Prefer one commit.
 5. **Grows mid-way.** If the work stops fitting the fit check while you implement (more files, an open decision, a guess), stop. Report what is done, leave it uncommitted, and recommend `build`. Never improvise a design decision.
 6. **Review.** Read `../review-and-fix/SKILL.md` and follow it on the whole change from the base commit to `HEAD`, with its default repeating passes. The work is committed, so it commits its fix batches, staging explicit paths. Do not run a separate single-pass review before the commit; this review covers the change.
-7. **Checkpoint: the user reviews the code.** Stop. Report the commit range (`<base>..HEAD`), commits (hash and subject), the gate result and the review summary. Do not push, merge or open pull requests.
+7. **Checkpoint: the user reviews the code.** Stop. Report the commit range (`<base>..HEAD`), commits (hash and subject), the gate result and the review summary. Do not push, merge or open pull requests. Add one line on what can follow the user's approval: `squash` (`../squash/SKILL.md`) tidies fix commits into the commits they fix, and `land` (`../land/SKILL.md`) merges a worktree branch into the primary checkout and cleans up.
 
 ## 3. Rules
 

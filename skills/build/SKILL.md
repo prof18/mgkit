@@ -19,7 +19,7 @@ Every skill named below is read from this skill's directory by relative path (fo
    - Small plan: continue in this session.
    - Big plan: if this session runs under a goal or long-running mode, continue. Otherwise tell the user that starting a fresh long-running session with the kickoff line from `../plan-max/references/kickoff.md` is recommended, and continue here only if the user says so.
 6. **Final review.** execute-plan ends with its final review: review-and-fix on the whole change from its base commit to `HEAD`, repeating passes until one comes back clean. Do not run another one here. If execute-plan stopped before finishing, there is no final review yet; report that at checkpoint B.
-7. **Checkpoint B: the user reviews the code.** Stop. Report the plan path, the commit range (`<base>..HEAD`), the gate result, the review summary, and remaining USER TASKs and blockers. Do not push, merge or open pull requests.
+7. **Checkpoint B: the user reviews the code.** Stop. Report the plan path, the commit range (`<base>..HEAD`), the gate result, the review summary, and remaining USER TASKs and blockers. Do not push, merge or open pull requests. Add one line on what can follow the user's approval: `squash` (`../squash/SKILL.md`) tidies fix commits into the commits they fix, and `land` (`../land/SKILL.md`) merges a worktree branch into the primary checkout and cleans up.
 
 ## 2. Resuming
 
