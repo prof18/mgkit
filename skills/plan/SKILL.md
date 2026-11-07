@@ -33,7 +33,7 @@ If the request does not fit, say that `plan-max` fits better and why, and ask wh
    Every question uses this format, including practical ones such as where the code lives or which project is meant.
 
    Skip this when a roast file already settles everything. Wait for the answers.
-4. **Write** the plan (below).
+4. **Write** the plan (below). Read `references/writing.md` from this skill's directory first and follow it in every sentence and code sample.
 5. **Self-check.** Read `references/cheap-agent-bar.md` from this skill's directory and make the plan satisfy every item. Fix gaps before presenting.
 6. **Present** the path, a summary of 5 to 10 lines, any open USER TASKs, and the next step: "Run `plan-review` on it, then `execute-plan`."
 

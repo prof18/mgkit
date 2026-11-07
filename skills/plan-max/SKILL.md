@@ -26,7 +26,7 @@ Read the size rule in `../plan/SKILL.md` (relative to this skill's directory; if
    Every question uses this format, including practical ones such as where the code lives or which project is meant.
 
    Always include the proposed milestone breakdown (one line per milestone) as a question, and get agreement on it. Skip other questions only when a roast file already settles them. Wait for the answers.
-4. **Write** the plan folder (below).
+4. **Write** the plan folder (below). Read `../plan/references/writing.md` (relative to this skill's directory) once first and follow it in every file.
 5. **Self-check.** Read `../plan/references/cheap-agent-bar.md` and make every file satisfy every item. Also check across files: ids in milestone files match `TODO.md`, constants are defined once in `00-conventions.html`, links between files work, and no task uses something a later task creates.
 6. **Present** the folder path, a summary of 5 to 10 lines, the milestone list, open USER TASKs, and the next step: "Run `plan-review` on it, then start it with the kickoff line below." Then print the kickoff lines (see Kickoff).
 

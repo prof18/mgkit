@@ -15,3 +15,4 @@ A plan passes only when an implementing agent that is cheaper and less capable t
 11. **Human steps marked.** Anything that needs credentials, devices, accounts, payments or visual judgement is a `USER TASK` and is never self-certified.
 12. **Roast honoured.** If a roast file exists, every decision in it is reflected and no rejected option reappears.
 13. **Repository conventions.** The plan follows the repository's own instruction files (AGENTS.md, CLAUDE.md, contributing docs) and existing code patterns, citing the files.
+14. **Plain writing.** The text follows `writing.md` in this directory: active voice, named actors, complete sentences, `must` and `can` for rules, and every code sample labelled `Existing`, `Diff` or `Sketch` in a line above it.

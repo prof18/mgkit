@@ -34,6 +34,34 @@ check_one() {
   hits="$(printf '%s\n' "$body" | grep -niE '<(style|script|link|iframe|object|embed)|<[a-z][^>]*[[:space:]](style|on[a-z]+)=|<[a-z][^>]*[[:space:]](src|poster|data)=["'"'"']?(https?:)?//|<(img|source|video|audio|track|image|use)[[:space:]/][^>]*(https?:)?//' || true)"
   if [ -n "$hits" ]; then printf 'FAIL %s: inline style, script or external resource: %s\n' "$file" "$hits"; bad=1; fi
 
+  # Leftovers are checked in prose only: a code sample can quote these markers on purpose.
+  hits="$(printf '%s\n' "$body" | awk '
+    {
+      rest = $0; prose = ""
+      while (rest != "") {
+        if (inpre) {
+          if (match(rest, /<\/pre>/)) { rest = substr(rest, RSTART + RLENGTH); inpre = 0 } else rest = ""
+        } else if (match(rest, /<pre[ >]/)) {
+          prose = prose substr(rest, 1, RSTART - 1); rest = substr(rest, RSTART); inpre = 1
+        } else { prose = prose rest; rest = "" }
+      }
+      if (tolower(prose) ~ /:contentreference\[|oaicite:|xx%|\[insert /) print NR ": " $0
+    }' || true)"
+  if [ -n "$hits" ]; then printf 'FAIL %s: generation leftover (citation marker or placeholder): %s\n' "$file" "$hits"; bad=1; fi
+
+  # A diff line that is only an elision ("…", "// ...", "# …") hides real lines; split the hunk instead.
+  # A bare "..." is left alone: it is real code in Python stubs, R and YAML.
+  hits="$(printf '%s\n' "$body" | awk '
+    /<pre[^>]*class="([^"]* )?diff( [^"]*)?"/ { indiff = 1 }
+    indiff {
+      line = $0; gsub(/<[^>]*>/, "", line)
+      # Decode only the ellipsis entities; "&amp;hellip;" is literal source text and stays as it is.
+      gsub(/&hellip;|&#8230;|&#x2026;/, "…", line)
+      if (line ~ /^[[:space:]+-]*(\/\/|#|--)[[:space:]]*(\.\.\.|…)[[:space:]]*$/ || line ~ /^[[:space:]+-]*…[[:space:]]*$/) print NR ": " $0
+    }
+    /<\/pre>/ { indiff = 0 }' || true)"
+  if [ -n "$hits" ]; then printf 'FAIL %s: elision inside a diff; split it into separate hunks: %s\n' "$file" "$hits"; bad=1; fi
+
   hits="$(printf '%s\n' "$body" | grep -nE "<[a-zA-Z][^>]*[[:space:]]class='" || true)"
   if [ -n "$hits" ]; then printf 'FAIL %s: write class values in double quotes: %s\n' "$file" "$hits"; bad=1; fi
 

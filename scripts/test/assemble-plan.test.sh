@@ -178,6 +178,64 @@ test_check_ignores_head_of_full_file() {
   assert_status 0
 }
 
+test_rejects_generation_leftovers() {
+  local d; d="$(new_dir)"
+  printf '<p>Fast :contentReference[oaicite:1]{index=1}.</p>\n' > "$d/a.html"
+  run_capture bash "$ASSEMBLE" --check "$d/a.html"
+  assert_status 1
+  assert_contains "generation leftover"
+  printf '<p>Cuts load time by XX%%.</p>\n' > "$d/b.html"
+  run_capture bash "$ASSEMBLE" --check "$d/b.html"
+  assert_status 1
+  assert_contains "generation leftover"
+  printf '<p>Owner: [Insert name].</p>\n' > "$d/c.html"
+  run_capture bash "$ASSEMBLE" --check "$d/c.html"
+  assert_status 1
+  assert_contains "generation leftover"
+}
+
+test_rejects_elision_inside_diff() {
+  local d; d="$(new_dir)"
+  printf '<pre class="diff"><code>  a\n  // ...\n<span class="add">+ b</span></code></pre>\n' > "$d/a.html"
+  run_capture bash "$ASSEMBLE" --check "$d/a.html"
+  assert_status 1
+  assert_contains "elision inside a diff"
+  printf '<pre class="diff"><code>  a\n<span class="del">- // …</span>\n</code></pre>\n' > "$d/b.html"
+  run_capture bash "$ASSEMBLE" --check "$d/b.html"
+  assert_status 1
+  assert_contains "elision inside a diff"
+  printf '<pre class="diff"><code>  a\n  &#8230;\n</code></pre>\n' > "$d/c.html"
+  run_capture bash "$ASSEMBLE" --check "$d/c.html"
+  assert_status 1
+  assert_contains "elision inside a diff"
+}
+
+test_allows_real_code_dots_and_elision_outside_diff() {
+  local d; d="$(new_dir)"
+  printf '<pre class="diff"><code><span class="add">+ f(...args)</span>\n<span class="add">+     ...</span>\n</code></pre>\n<pre><code>a\n...\n</code></pre>\n<p>Wait...</p>\n' > "$d/a.html"
+  run_capture bash "$ASSEMBLE" --check "$d/a.html"
+  assert_status 0
+}
+
+test_allows_leftover_words_in_code_and_as_identifiers() {
+  local d; d="$(new_dir)"
+  printf '<p>Set <code>contentReference</code> to the record id.</p>\n<pre><code>grep -E ":contentReference\\[oaicite:" | grep "XX%%"\n</code></pre>\n<pre class="diff"><code><span class="add">+ &amp;hellip; &amp;#8230;</span>\n</code></pre>\n' > "$d/a.html"
+  run_capture bash "$ASSEMBLE" --check "$d/a.html"
+  assert_status 0
+}
+
+test_rejects_leftover_on_a_code_boundary_line() {
+  local d; d="$(new_dir)"
+  printf '<pre><code>ok</code></pre><p>Owner: [Insert name].</p>\n' > "$d/a.html"
+  run_capture bash "$ASSEMBLE" --check "$d/a.html"
+  assert_status 1
+  assert_contains "generation leftover"
+  printf '<p>Cuts XX%% of time.</p><pre><code>a\n</code></pre>\n' > "$d/b.html"
+  run_capture bash "$ASSEMBLE" --check "$d/b.html"
+  assert_status 1
+  assert_contains "generation leftover"
+}
+
 test_catalog_passes_and_stays_small() {
   run_capture bash "$ASSEMBLE" --check "$CATALOG"
   assert_status 0

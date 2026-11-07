@@ -20,7 +20,7 @@ Make a plan safe to hand to a cheaper agent: find what is wrong, missing or ambi
 |---|---|
 | Consistency | Constants that differ between files; task ids in milestone files versus `TODO.md`; paths that don't match the target layout; decisions contradicted later; broken links between plan files. |
 | Completeness | Missing steps (setup, migrations, cleanup, docs, changelog, release), missing tests, missing error handling, missing acceptance lines, undefined terms. |
-| Cheap-agent risk | Every item in `../plan/references/cheap-agent-bar.md` (relative to this skill's directory; if unresolvable, find `skills/plan/references/cheap-agent-bar.md` in the mgkit installation). Also: steps that use something created later, vague verbs ("handle", "support", "improve"), steps too big for one commit, instructions that need taste. |
+| Cheap-agent risk | Every item in `../plan/references/cheap-agent-bar.md` (relative to this skill's directory; if unresolvable, find `skills/plan/references/cheap-agent-bar.md` in the mgkit installation), including the writing rules in `../plan/references/writing.md`. Also: steps that use something created later, vague verbs ("handle", "support", "improve"), steps too big for one commit, instructions that need taste. |
 | Facts | Check APIs, CLI flags, library versions, file formats and platform limits against current documentation or local tool help. Search the web. Keep the source for every correction. |
 | Security | Secret handling, injection, authentication and permissions, unsafe defaults, new dependencies, sensitive data in logs. |
 | Performance | Hot paths, unbounded work, N+1 patterns, large payloads, missing caching or pagination where the plan implies scale. |
@@ -45,6 +45,7 @@ Always do the whole of every pass yourself. Also read `../review-and-fix/referen
   ```
 
   Apply the answers, then go on to section 4.
+- When you reword plan text, follow "Rewriting an existing plan" in `../plan/references/writing.md`: keep every threshold, default, limit, path, command and caveat.
 - Keep HTML code samples escaped. Do not commit plan files.
 - Keep plan markup to the components in `../plan/templates/components.html`. Never add `<style>`, `style=` or `<script>`. After editing, run `bash <script> --check <every edited .html file>` and fix every `FAIL`, where `<script>` is the absolute path of `../plan/scripts/assemble-plan.sh` resolved from this skill's directory (if you cannot resolve it, search for `skills/plan/scripts/assemble-plan.sh` inside the mgkit installation).
 
