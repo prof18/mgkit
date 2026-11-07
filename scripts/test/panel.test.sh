@@ -12,7 +12,8 @@ _tmp_dirs+=("$STUBS_ROOT")
 
 # new_stubs SEAT... -> prints a temp dir; sets up a bin/ with one stub CLI per seat.
 # A stub logs its argv to <dir>/<seat>.args and prints "review from <seat>" (codex writes it to its -o file).
-# STUB_EXIT_<seat>, STUB_SLEEP_<seat> and STUB_EMPTY_<seat>=1 change its behaviour.
+# STUB_EXIT_<seat>, STUB_SLEEP_<seat>, STUB_EMPTY_<seat>=1, STUB_FAIL_MODEL_<seat> and STUB_HANG_MODEL_<seat>
+# (sleeps 30s when that model is passed) change its behaviour.
 new_stubs() {
   local dir seat
   dir="$(mktemp -d "$STUBS_ROOT/stubs.XXXXXX")"
@@ -22,9 +23,10 @@ new_stubs() {
 #!/bin/bash
 printf '%s\n' "\$@" >"$dir/$seat.args"
 cat >/dev/null
-eval "sleep_for=\\\${STUB_SLEEP_$seat:-0}; exit_with=\\\${STUB_EXIT_$seat:-0}; empty=\\\${STUB_EMPTY_$seat:-}; fail_model=\\\${STUB_FAIL_MODEL_$seat:-}"
+eval "sleep_for=\\\${STUB_SLEEP_$seat:-0}; exit_with=\\\${STUB_EXIT_$seat:-0}; empty=\\\${STUB_EMPTY_$seat:-}; fail_model=\\\${STUB_FAIL_MODEL_$seat:-}; hang_model=\\\${STUB_HANG_MODEL_$seat:-}"
 for a in "\$@"; do
   if [ -n "\$fail_model" ] && [ "\$a" = "\$fail_model" ]; then echo "429 rate limit reached for \$a" >&2; exit 1; fi
+  if [ -n "\$hang_model" ] && [ "\$a" = "\$hang_model" ]; then sleep_for=30; fi
 done
 sleep "\$sleep_for"
 text="review from $seat"
@@ -178,22 +180,42 @@ test_pi_reports_a_failed_fallback() {
   assert_contains "fallback xai/grok-4.7"
 }
 
-test_pi_does_not_fall_back_after_a_timeout() {
+test_pi_falls_back_after_its_model_times_out() {
+  local d start; d="$(new_stubs pi)"
+  start="$(date +%s)"
+  MGKIT_PANEL_PI_MODEL=zai/glm-5.3 MGKIT_PANEL_PI_FALLBACK_MODEL=xai/grok-4.7 STUB_HANG_MODEL_pi=zai/glm-5.3 MGKIT_PANEL_TIMEOUT=2 \
+    panel "$d" run --driver claude --prompt-file "$d/prompt.md" --out-dir "$d/out" --repo "$d"
+  assert_status 0
+  assert_contains $'pi\tok'
+  assert_contains "fallback xai/grok-4.7 after timed out after 2s"
+  assert_file_contains "$d/out/pi.md" "review from pi"
+  [ $(( $(date +%s) - start )) -lt 15 ] || fail "the timeout did not stop the primary attempt"
+}
+
+test_pi_fallback_gets_its_own_timeout() {
   local d start; d="$(new_stubs pi)"
   start="$(date +%s)"
   MGKIT_PANEL_PI_FALLBACK_MODEL=xai/grok-4.7 STUB_SLEEP_pi=30 MGKIT_PANEL_TIMEOUT=2 \
     panel "$d" run --driver claude --prompt-file "$d/prompt.md" --out-dir "$d/out" --repo "$d"
   assert_status 3
-  assert_contains "timed out after 2s"
-  [ ! -e "$d/out/pi.fallback" ] || fail "fell back after a timeout"
-  [ $(( $(date +%s) - start )) -lt 15 ] || fail "the timeout did not stop the seat"
+  assert_contains $'pi\tfailed\ttimed out after 2s'
+  assert_contains "fallback xai/grok-4.7 after timed out after 2s"
+  [ $(( $(date +%s) - start )) -lt 15 ] || fail "the fallback ran without a timeout"
 }
 
-test_no_timeout_by_default() {
+test_default_timeout_is_one_hour() {
   local d; d="$(new_stubs pi)"
-  STUB_SLEEP_pi=2 panel "$d" run --driver claude --prompt-file "$d/prompt.md" --out-dir "$d/out" --repo "$d"
+  panel "$d" run --driver claude --prompt-file "$d/prompt.md" --out-dir "$d/out" --repo "$d"
+  assert_status 0
+  assert_contains "timeout: 3600s, log:"
+}
+
+test_timeout_zero_turns_it_off() {
+  local d; d="$(new_stubs pi)"
+  STUB_SLEEP_pi=2 MGKIT_PANEL_TIMEOUT=0 panel "$d" run --driver claude --prompt-file "$d/prompt.md" --out-dir "$d/out" --repo "$d"
   assert_status 0
   assert_contains $'pi\tok'
+  assert_contains "timeout: none, log:"
 }
 
 run_tests

@@ -7,6 +7,9 @@
 # Exit codes: 0 at least one seat returned a review, 2 usage error, 3 no seat returned a review.
 set -euo pipefail
 
+# A seat still running after this many seconds is stopped. The slowest real review seen took about 40 minutes;
+# a stalled model never ends on its own.
+DEFAULT_TIMEOUT=3600
 KNOWN_KEYS="MGKIT_PANEL_SEATS MGKIT_PANEL_CLAUDE_MODEL MGKIT_PANEL_CODEX_MODEL MGKIT_PANEL_PI_MODEL MGKIT_PANEL_PI_FALLBACK_MODEL MGKIT_PANEL_PI_EXTENSIONS MGKIT_PANEL_TIMEOUT"
 
 usage() {
@@ -92,31 +95,51 @@ exec_seat() {
   esac
 }
 
-# seat_job SEAT PROMPT OUT: runs one seat. When pi fails for any reason but the timeout (a rate limit, quota or
-# auth error makes it exit non-zero with an empty review), it runs once more with MGKIT_PANEL_PI_FALLBACK_MODEL.
-# The CLI runs as a child, and a TERM from the timeout watcher is passed on to it.
-seat_job() {
-  local seat="$1" prompt="$2" out="$3" child="" rc=0
-  trap '[ -z "$child" ] || kill -TERM "$child" 2>/dev/null; exit 143' TERM
+# run_attempt SEAT PROMPT OUT TIMEOUT: runs the CLI once as a child; with a TIMEOUT (seconds) a watcher stops it
+# and leaves OUT/SEAT.timeout behind. Sets the caller's $child so a TERM can be passed on.
+run_attempt() {
+  local seat="$1" prompt="$2" out="$3" timeout="$4" rc=0 watcher=""
+  rm -f "$out/$seat.timeout"
   (exec_seat "$seat" "$prompt" "$out") &
   child=$!
+  if [ -n "$timeout" ]; then
+    # Detached from our stdout/stderr, so a sleep that outlives a fast seat never holds a caller's pipe open.
+    (sleep "$timeout" && : >"$out/$seat.timeout" && kill -TERM "$child") </dev/null >/dev/null 2>&1 &
+    watcher=$!
+  fi
   wait "$child" || rc=$?
-  if [ "$seat" != pi ] || [ -z "${MGKIT_PANEL_PI_FALLBACK_MODEL:-}" ] || [ -e "$out/$seat.timeout" ]; then return "$rc"; fi
+  if [ -n "$watcher" ]; then kill "$watcher" 2>/dev/null || true; fi
+  return "$rc"
+}
+
+# seat_job SEAT PROMPT OUT TIMEOUT: runs one seat. When pi fails for any reason (a rate limit, quota or auth error,
+# or a model that stalls until the timeout), it runs once more with MGKIT_PANEL_PI_FALLBACK_MODEL, under its own
+# timeout. A TERM is passed on to the running CLI.
+seat_job() {
+  local seat="$1" prompt="$2" out="$3" timeout="$4" child="" rc=0 reason
+  trap '[ -z "$child" ] || kill -TERM "$child" 2>/dev/null; exit 143' TERM
+  run_attempt "$seat" "$prompt" "$out" "$timeout" || rc=$?
+  if [ "$seat" != pi ] || [ -z "${MGKIT_PANEL_PI_FALLBACK_MODEL:-}" ]; then return "$rc"; fi
   if [ "$rc" -eq 0 ] && grep -q '[^[:space:]]' "$out/$seat.md" 2>/dev/null; then return 0; fi
   mv "$out/$seat.log" "$out/$seat.primary.log"
-  printf '%s\texit %s: %s\n' "$MGKIT_PANEL_PI_FALLBACK_MODEL" "$rc" \
-    "$(tr '\n' ' ' <"$out/$seat.primary.log" | cut -c1-200)" >"$out/$seat.fallback"
+  if [ -e "$out/$seat.timeout" ]; then
+    reason="timed out after ${timeout}s"
+  else
+    reason="exit $rc: $(tr '\n' ' ' <"$out/$seat.primary.log" | cut -c1-200)"
+  fi
+  printf '%s\t%s\n' "$MGKIT_PANEL_PI_FALLBACK_MODEL" "$reason" >"$out/$seat.fallback"
   rc=0
-  (MGKIT_PANEL_PI_MODEL="$MGKIT_PANEL_PI_FALLBACK_MODEL"; exec_seat "$seat" "$prompt" "$out") &
-  child=$!
-  wait "$child" || rc=$?
+  MGKIT_PANEL_PI_MODEL="$MGKIT_PANEL_PI_FALLBACK_MODEL" run_attempt "$seat" "$prompt" "$out" "$timeout" || rc=$?
   return "$rc"
 }
 
 run_panel() {
-  local driver="$1" prompt="$2" out="$3" repo="$4" timeout="${MGKIT_PANEL_TIMEOUT:-}"
-  local seats=() pids=() watchers=() seat status detail i rc ok=0 line fb_model fb_reason model
-  case "$timeout" in '' | *[!0-9]* | 0) [ -z "$timeout" ] || usage ;; esac
+  local driver="$1" prompt="$2" out="$3" repo="$4" timeout="${MGKIT_PANEL_TIMEOUT:-$DEFAULT_TIMEOUT}"
+  local seats=() pids=() seat status detail i rc ok=0 line fb_model fb_reason model timeout_label
+  case "$timeout" in '' | *[!0-9]*) usage ;; esac
+  timeout=$((10#$timeout))
+  timeout_label="${timeout}s"
+  if [ "$timeout" -eq 0 ]; then timeout=""; timeout_label=none; fi
   mkdir -p "$out"
   : >"$out/status.tsv"
   while IFS= read -r line; do
@@ -132,22 +155,16 @@ run_panel() {
   fi
   for seat in "${seats[@]}"; do
     rm -f "$out/$seat.md" "$out/$seat.log" "$out/$seat.timeout" "$out/$seat.fallback" "$out/$seat.primary.log"
-    (cd "$repo" && seat_job "$seat" "$prompt" "$out") &
+    (cd "$repo" && seat_job "$seat" "$prompt" "$out" "$timeout") &
     pids+=("$!")
     model="$(seat_model "$seat")"
     if [ "$seat" = pi ] && [ -n "${MGKIT_PANEL_PI_FALLBACK_MODEL:-}" ]; then model="$model, fallback: $MGKIT_PANEL_PI_FALLBACK_MODEL"; fi
-    printf 'started %s (model: %s, log: %s)\n' "$seat" "$model" "$out/$seat.log"
-    if [ -n "$timeout" ]; then
-      # Detached from our stdout/stderr, so a sleep that outlives a fast seat never holds a caller's pipe open.
-      (sleep "$timeout" && : >"$out/$seat.timeout" && kill -TERM "${pids[${#pids[@]}-1]}") </dev/null >/dev/null 2>&1 &
-      watchers+=("$!")
-    fi
+    printf 'started %s (model: %s, timeout: %s, log: %s)\n' "$seat" "$model" "$timeout_label" "$out/$seat.log"
   done
   for i in "${!seats[@]}"; do
     seat="${seats[$i]}"
     rc=0
     wait "${pids[$i]}" || rc=$?
-    if [ -n "$timeout" ]; then kill "${watchers[$i]}" 2>/dev/null || true; fi
     # Exit status first: a seat that finished cleanly is never reported as timed out.
     if [ "$rc" -eq 0 ] && grep -q '[^[:space:]]' "$out/$seat.md" 2>/dev/null; then
       status=ok; detail="$out/$seat.md"; ok=1

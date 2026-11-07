@@ -15,9 +15,9 @@ A panel puts other agent CLIs next to you on the same review. You are the **driv
   | `MGKIT_PANEL_CLAUDE_MODEL` | `--model` for the claude seat | CLI default |
   | `MGKIT_PANEL_CODEX_MODEL` | `-m` for the codex seat | CLI default |
   | `MGKIT_PANEL_PI_MODEL` | `--model` for the pi seat, e.g. `zai/glm-5.3` | CLI default |
-  | `MGKIT_PANEL_PI_FALLBACK_MODEL` | Model for one retry when the pi seat fails for any reason but the timeout (rate limit, quota, auth), e.g. `xai/grok-4.7` | no retry |
+  | `MGKIT_PANEL_PI_FALLBACK_MODEL` | Model for one retry when the pi seat fails for any reason (rate limit, quota, auth, or a stall that hits the timeout), e.g. `xai/grok-4.7`; the retry gets its own timeout | no retry |
   | `MGKIT_PANEL_PI_EXTENSIONS` | Space-separated pi extension paths to load, e.g. one that provides a model's provider; a leading `~/` is allowed | none: every extension stays off |
-  | `MGKIT_PANEL_TIMEOUT` | Seconds before a seat is stopped | none: a review takes the time it needs |
+  | `MGKIT_PANEL_TIMEOUT` | Seconds before a seat is stopped; `0` turns the limit off | `3600`: the slowest real review seen took about 40 minutes, and a stalled model never ends on its own |
 
 - **Availability:** run `bash <script> seats --driver <you>`. Every line reads `seat<TAB>available|skipped<TAB>model or reason`. With at least one `available` seat, the panel runs. With none, say "Panel: no other seat available (<reasons>)" and do the review without a panel, as the calling skill describes.
 - **Sandbox:** the seats need network access and write their output outside the repository. If your harness sandbox blocks that, ask the user to let you run the script outside the sandbox. If that is refused, continue without a panel and say so.
@@ -34,7 +34,7 @@ All panel files for one review live in the session scratch or temp directory, ne
 1. Write the target into `round-1/`: for code, the output of the git command that shows the review target (for example `git diff <base>` or `git diff <base>..HEAD`) as `target.diff`; for a plan, nothing, since the plan is already a file. Take the round-1 snapshot.
 2. Write the round-1 prompt (section 3) to `round-1/prompt.md`.
 3. Start `bash <script> run --driver <you> --prompt-file <round-1/prompt.md> --out-dir <round-1> --repo <repo root>`. If you can run it in the background, do, and do your own full review meanwhile; otherwise do your review first, then run the script. Your own review is always done: you are a seat too.
-4. A seat can take many minutes. Codex streams its progress to its `<seat>.log`; claude and pi write only when they finish. Never cut a seat short on your own.
+4. A seat can take many minutes. Codex streams its progress to its `<seat>.log`; claude and pi write only when they finish. Never cut a seat short on your own; the script stops a seat at `MGKIT_PANEL_TIMEOUT`.
 5. Read `status.tsv`. Take every `ok` seat's review, and name every `skipped` and `failed` seat in the report.
 
 **Merge and decide.** Give every finding a panel id (`P1`, `P2`, …), used as its ledger id too, and a source (`driver`, `claude`, `codex`, `pi`, or `user`). Dedupe by root cause; a finding raised by two or more seats keeps every source. Then verify, grade, fix and record outcomes exactly as the calling skill says. Your decision on each finding is its **disposition**: `fixed` (what changed), `rejected` (one-line reason), `follow-up`, `escalate`, or `discarded`.

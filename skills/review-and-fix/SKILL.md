@@ -182,7 +182,7 @@ If the user asks for a "deep" or parallel review (e.g. two models on the same ba
 - Real review work can take many minutes; treat advancing progress as healthy.
 - Inspect a quiet reviewer only after repeated missing heartbeats, an explicit failure, or the environment timeout.
 - If a reviewer fails (sandbox, auth, rate limit, capacity), report it and continue with remaining evidence instead of inventing results.
-- Panel seats have no time limit unless `MGKIT_PANEL_TIMEOUT` is set. Follow their progress in each seat's log file.
+- Panel seats are stopped after `MGKIT_PANEL_TIMEOUT` seconds (default 3600; `0` turns the limit off). Follow their progress in each seat's log file.
 
 ## Reviewer Prompt
 
