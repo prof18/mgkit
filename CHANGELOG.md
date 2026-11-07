@@ -4,6 +4,8 @@ All notable changes to mgkit. Versions stay 0.0.x until the toolkit is declared 
 
 ## [Unreleased]
 
+## [0.0.11] - 2026-11-07
+
 ### Added
 
 - `plan`, `plan-max` and `plan-review` follow a shared writing guide, `skills/plan/references/writing.md`, adapted from rock3r/publish-spec. It asks for active voice, named actors, complete sentences, `must` and `can` for rules, every code sample labelled `Existing`, `Diff` or `Sketch` in a line above it, and rewrites that keep every threshold and caveat. The plan templates and component catalog carry the label line.
