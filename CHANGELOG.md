@@ -4,6 +4,13 @@ All notable changes to mgkit. Versions stay 0.0.x until the toolkit is declared 
 
 ## [Unreleased]
 
+## [0.0.12] - 2026-11-07
+
+### Changed
+
+- Review panel seats stop after one hour by default (`MGKIT_PANEL_TIMEOUT=3600`; `0` turns the limit off). A seat used to run with no limit, so a model that stalled mid-stream blocked the whole review. The slowest real review seen took about 40 minutes.
+- The pi seat retries with `MGKIT_PANEL_PI_FALLBACK_MODEL` when its model hits the timeout too, and the retry gets its own timeout. The `started` line names the timeout.
+
 ## [0.0.11] - 2026-11-07
 
 ### Added
