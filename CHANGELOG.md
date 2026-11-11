@@ -4,6 +4,8 @@ All notable changes to mgkit. Versions stay 0.0.x until the toolkit is declared 
 
 ## [Unreleased]
 
+## [0.0.13] - 2026-11-11
+
 ### Changed
 
 - `quick` switches to `build` on its own when the change fails its fit check, before or during implementation, instead of stopping to recommend it. It's safe because `build` still stops at its plan checkpoint before any code is written. Work done before a mid-way switch stays uncommitted, and the plan starts from it.
