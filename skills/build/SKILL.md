@@ -11,7 +11,7 @@ Every skill named below is read from this skill's directory by relative path (fo
 
 ## 1. Stages
 
-1. **Size.** Apply the size rule in `../plan/SKILL.md`. State the choice (`plan` or `plan-max`) with a one-line reason. If the request already names one, use it. If the change is tiny and clear enough to pass the fit check in `../quick/SKILL.md`, add one line saying `quick` would skip the plan. Do not wait for a reply here; the user can override in their next message.
+1. **Size.** Apply the size rule in `../plan/SKILL.md`. State the choice (`plan` or `plan-max`) with a one-line reason. If the request already names one, use it. If the change is tiny and clear enough to pass the fit check in `../quick/SKILL.md`, add one line saying `quick` would skip the plan. Do not wait for a reply here; the user can override in their next message. If the request names a ticket (a task note, board card or issue, by path, link or id), read `../land/references/tickets.md` and move it to in progress as it says.
 2. **Plan.** Read `../plan/SKILL.md` or `../plan-max/SKILL.md` and follow it completely, including its questions round. If a roast file for this feature exists, use it. The stage ends with the plan path.
 3. **Plan review.** Read `../plan-review/SKILL.md` and follow it on the plan path. It repeats passes on its own until one comes back clean.
 4. **Checkpoint A: the user checks the plan.** Stop. Show the plan path, the review report and any open USER TASKs. Ask the user to read the plan and reply "go", or to request changes. Apply requested changes to the plan and ask again. Never continue without an explicit go.

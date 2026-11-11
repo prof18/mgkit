@@ -4,6 +4,11 @@ All notable changes to mgkit. Versions stay 0.0.x until the toolkit is declared 
 
 ## [Unreleased]
 
+### Changed
+
+- `quick` switches to `build` on its own when the change fails its fit check, before or during implementation, instead of stopping to recommend it. It's safe because `build` still stops at its plan checkpoint before any code is written. Work done before a mid-way switch stays uncommitted, and the plan starts from it.
+- `quick` and `build` move the ticket a request names (task note, board card or issue) to in progress when the work starts. They never search for one. A local note is moved without asking; a hosted tracker is moved only after the user agrees, or when their instructions already say to. The rules for finding a ticket and changing its status live in `skills/land/references/tickets.md`, shared with `land`, which marks it done.
+
 ## [0.0.12] - 2026-11-07
 
 ### Changed

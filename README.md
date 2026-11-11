@@ -30,8 +30,8 @@ roast ──▶ plan / plan-max ──▶ plan-review ──▶ [you check the p
 | `plan-review` | Reviews a plan and fixes it in place, repeating passes until one comes back clean (at most 4) | Before executing any plan |
 | `execute-plan` | Implements a small plan in one run, or a big plan task by task from `TODO.md`, then runs a repeating review-and-fix on the whole change | A reviewed plan is ready |
 | `review-and-fix` | Bounded review passes that grade findings and fix only confirmed ones, repeating until one comes back clean (at most 3) | Before a commit, a merge, or after a large change |
-| `build` | Runs plan, plan-review, execute-plan and review-and-fix, stopping twice for you | You want a feature taken end to end |
-| `quick` | Implements a small, clear change without a plan (test first, gate, commit), then runs a repeating review-and-fix and stops for you; hands off to `build` if the change grows | The change is easy and a plan would cost more than the work |
+| `build` | Runs plan, plan-review, execute-plan and review-and-fix, stopping twice for you; moves a named ticket to in progress | You want a feature taken end to end |
+| `quick` | Implements a small, clear change without a plan (test first, gate, commit), then runs a repeating review-and-fix and stops for you; switches to `build` on its own, without asking, if the change is or grows too big; moves a named ticket to in progress | The change is easy and a plan would cost more than the work |
 | `squash` | Tidies a branch's commits into the shape that reads best: fixes fold into the commit they fix, separate concerns stay separate, the code stays identical | Review left fix commits on top of the work |
 | `land` | Fast-forwards the primary checkout to a worktree branch (rebasing and rerunning the gate if needed), removes the worktree and branch, marks the ticket done | You approved the code and want it merged locally |
 | `plan-to-docs` | Turns finished plans into present-tense docs written from the code, points `AGENTS.md` at them, and deletes the plans | A plan is done and should become documentation |

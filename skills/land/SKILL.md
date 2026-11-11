@@ -13,12 +13,7 @@ Invoking this skill authorizes the fast-forward merge, a rebase of the task bran
 
 - **Worktree and branch.** Use the worktree this session worked in, or the one the user names. Read its path and branch from `git worktree list`. If more than one worktree could be meant, ask which.
 - **Primary checkout and target.** The primary checkout is the first entry of `git worktree list`. Its checked-out branch is the target. If it is detached, or the user expects a different branch, ask before merging.
-- **Ticket.** The task note, board card or issue the work came from. Find it in this order:
-  1. What the conversation already gives: a ticket path or link passed to this skill, to `quick` or `build`, or mentioned when the work started.
-  2. The user's or repository's instructions, which may say where tickets live and which status values they use.
-  3. A search of that location for the branch topic or commit subject.
-  - If there is no clear single match, ask. Never guess a ticket.
-  - If the work has no ticket, skip the ticket step and say so.
+- **Ticket.** The task note, board card or issue the work came from. Read `references/tickets.md` (relative to this skill's directory) and find it as its "Find the ticket" section says.
 
 ## 2. Preflight
 
@@ -34,7 +29,7 @@ Stop on the first failure:
   - **Rebase conflict:** run `git -C <worktree> rebase --abort`, report the conflicting files and ask.
   - **Gate fails:** stop and report the failure.
   - Never create a merge commit unless the user asks for one.
-- **Ticket status is known.** You know which value means done for this tracker. Take it from the user's or repository's instructions, or from the board's own configuration, such as its column order. If you cannot tell, ask.
+- **Ticket status is known.** You know which value means done for this tracker, as the "Know the status value" section of `references/tickets.md` says.
 
 If the branch still has fix commits that belong in earlier ones, mention that `squash` can tidy them (`../squash/SKILL.md`, relative to this skill's directory). Run it only if the user asks.
 
@@ -61,8 +56,7 @@ git -C <primary> branch -d <branch>
 
 ## 5. Mark the ticket done
 
-- **Local note or file.** Change only the status field to the done value, written exactly as the tracker spells it. Leave every other field as it is.
-- **Hosted tracker** (an issue on GitHub, a ticket in a project tool). Changing it is visible to others, so ask before you close or move it, unless the user already asked for that in this conversation.
+Change the status to the done value as the "Change the status" section of `references/tickets.md` says: only the status field of a local note, and ask first for a hosted tracker unless the user already asked for it.
 
 ## 6. Report
 
