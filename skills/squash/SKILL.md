@@ -9,6 +9,8 @@ Turn a branch's commits into the history a reviewer would want to read: one comm
 
 Invoking this skill is the user's request to rewrite the branch's unpublished history: resets, rebases and rewording. It never covers pushing.
 
+**Delegated mode.** If the first line of the session's first user message starts with `mgkit delegated mode:`, read `../build/references/delegated.md` (relative to this skill's directory; if you cannot resolve it, search for `skills/build/references/delegated.md` inside the mgkit installation) and follow it: the delegate it names takes the user's place in every question, wait and checkpoint below.
+
 ## 1. Branch and base
 
 - **Branch.** Use the branch this session worked on, or the one the user names. If it is checked out in a worktree, run every command there with `git -C <path>`.
@@ -25,7 +27,7 @@ Invoking this skill is the user's request to rewrite the branch's unpublished hi
 Stop on the first failure:
 
 - **No tracked changes.** `git status --short` shows no modified tracked files. Untracked and ignored files are fine.
-- **Nothing published.** `git branch -r --contains <oldest commit in the range>` prints nothing. A commit on a remote would need a force push to rewrite, so stop and ask.
+- **Nothing published.** `git branch -r --contains <oldest commit in the range>` prints nothing. A commit on a remote would need a force push to rewrite, so stop and ask. In delegated mode with `squash=yes` and `push=yes`, commits published only on the worker's own branch are allowed: the check passes when `git branch -r --contains <oldest commit>` prints only `origin/<own branch>`. Before the rewrite, check the remote tip, and after it push with the lease on the approved head, both as `../build/references/delegated.md` says.
 
 ## 3. Decide the shape
 

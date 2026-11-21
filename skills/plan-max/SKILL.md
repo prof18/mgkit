@@ -7,6 +7,8 @@ description: Write a detailed multi-file implementation plan for a big or comple
 
 Turn a big feature or project into a plan folder that a cheaper, less capable agent can work through task by task, across many sessions, without making judgement calls.
 
+**Delegated mode.** If the first line of the session's first user message starts with `mgkit delegated mode:`, read `../build/references/delegated.md` (relative to this skill's directory; if you cannot resolve it, search for `skills/build/references/delegated.md` inside the mgkit installation) and follow it: the delegate it names takes the user's place in every question, wait and checkpoint below.
+
 ## When to use: the size rule
 
 Read the size rule in `../plan/SKILL.md` (relative to this skill's directory; if that path cannot be resolved, look for `skills/plan/SKILL.md` inside the mgkit installation). Use `plan-max` when the work fails any condition of that rule. If the request actually fits `plan`, say so and why, and ask whether to switch. Never switch silently.

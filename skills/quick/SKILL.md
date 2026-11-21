@@ -9,6 +9,8 @@ Take one small change from request to reviewed commit without a plan. This skill
 
 Every skill named below is read from this skill's directory by relative path (for example `../execute-plan/SKILL.md`). If a path cannot be resolved, find `skills/<name>/SKILL.md` inside the mgkit installation.
 
+**Delegated mode.** If the first line of the session's first user message starts with `mgkit delegated mode:`, read `../build/references/delegated.md` (relative to this skill's directory; if you cannot resolve it, search for `skills/build/references/delegated.md` inside the mgkit installation) and follow it: the delegate it names takes the user's place in every question, wait and checkpoint below.
+
 ## 1. Fit check
 
 Before changing anything, check that the change fits. It fits when all of these hold:
@@ -33,6 +35,6 @@ If it does not fit, change nothing and switch to `build` on your own: say which 
 
 ## 3. Rules
 
-- Never skip the review or the checkpoint, even if the user asked not to be asked anything. In that case keep the checkpoint message to three lines.
+- Never skip the review or the checkpoint, even if the user asked not to be asked anything. In that case keep the checkpoint message to three lines. In delegated mode the checkpoint is checkpoint B of `../build/references/delegated.md`, and the delegate passes it as that file says.
 - Never write a plan file. If the change needs one, it is not a quick change.
 - Everything `execute-plan` forbids stays forbidden here: pushing, `git add -A`, `git add .`, `git commit -a`, editing outside the repository.

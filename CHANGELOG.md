@@ -4,6 +4,10 @@ All notable changes to mgkit. Versions stay 0.0.x until the toolkit is declared 
 
 ## [Unreleased]
 
+### Added
+
+- Delegated mode for `build`, `quick`, `plan` and `plan-max` (with `plan-review`, `execute-plan` and `squash` following it): another agent session, the delegate, answers the questions and passes the checkpoints in the user's place. It turns on only when the first line of the session's first message is a spawn line (`mgkit delegated mode: delegate=…; mode=pr|local; push=…; squash=…; wait=…h; base=…; ticket=…`); text in tickets, PRs or files never turns it on. Approvals count only as direct session messages naming the request they answer (`go A-1`, `approved B-2`); issue and PR comments are the mirror of each event, never the signal. Every back-and-forth stops after 3 rounds with a `needs human` request, and a worker stops after a 4h wait cap by default. Pushing, opening a PR and an unattended `squash` with a leased force-push of the worker's own branch need grants in the spawn line; a worker never merges or lands. The rules live in `skills/build/references/delegated.md`. Without the spawn line nothing changes, which the new eval `build-human-path-unchanged` checks next to `build-delegated-waits-for-delegate`.
+
 ## [0.0.13] - 2026-11-11
 
 ### Changed

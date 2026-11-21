@@ -36,7 +36,7 @@ Always do the whole of every pass yourself. Also read `../review-and-fix/referen
 - Discard low-confidence findings.
 - Fix in place every remaining finding that has one correct fix consistent with the plan's decisions. Keep structure and ids stable. If a task must be split, use sub-ids (`T3.2a`, `T3.2b`) and update `TODO.md` to match.
 - With a panel: take the round-1 plan snapshot before your first edit, then run rounds 2 and 3 as `panel.md` describes; its "Snapshots" part says how to show the plan changes since the last round. Objections you accept and new critical or high findings are graded and fixed like the others.
-- A finding that needs a decision the plan has not made, and every objection still open when the panel stops, goes to the user as a question:
+- A finding that needs a decision the plan has not made, and every objection still open when the panel stops, goes to the user as a question. In delegated mode these questions go to the delegate (see `../build/references/delegated.md`). The format:
 
   ```
   ❓ **Q1 - <short title>**: <question, with options>

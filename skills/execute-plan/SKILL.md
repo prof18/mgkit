@@ -7,6 +7,8 @@ description: "Implement an existing plan written by plan or plan-max. A single H
 
 Implement a plan exactly as written, with commits sized for feature scope and reviewability.
 
+**Delegated mode.** If the first line of the session's first user message starts with `mgkit delegated mode:`, read `../build/references/delegated.md` (relative to this skill's directory; if you cannot resolve it, search for `skills/build/references/delegated.md` inside the mgkit installation) and follow it: the delegate it names takes the user's place in every question, wait and checkpoint below.
+
 ## 1. Resolve the plan
 
 - The argument is a path. Without one, look under `plan/` (or the plan location the user's instructions define) for unfinished plans: every `.html` file, and every folder whose `TODO.md` still has an unchecked box that is not a USER TASK. Sort newest first. If exactly one exists, use it and say so; otherwise ask which one. If none exists, say that no plan was found, where plans are expected, and stop without changing anything.
@@ -21,10 +23,10 @@ Implement a plan exactly as written, with commits sized for feature scope and re
 5. Run the plan's gate command before every commit. Never commit on a red gate. Never weaken, skip or delete tests to get green.
 6. Review before committing: read `../review-and-fix/SKILL.md` (relative to this skill's directory; if that path cannot be resolved, find `skills/review-and-fix/SKILL.md` in the mgkit installation) and follow it on the staged change as a single pass. Do this before every commit, including intermediate commits. The repeating review runs once, on the whole change, in the final review (section 5).
 7. Stage explicit paths only. Never run `git add -A`, `git add .` or `git commit -a`. Never stage anything under `plan/` or wherever the plan lives. Run `git status --short` before every commit.
-8. Never push, never add remotes, never publish, unless the user explicitly asks in this conversation.
+8. Never push, never add remotes, never publish, unless the user explicitly asks in this conversation. In delegated mode the spawn line's `push` field is that request.
 9. Never edit the plan, except `TODO.md` in loop mode.
 10. When reality contradicts the plan (an API differs, a file is missing, a decision cannot be implemented), do not improvise. In loop mode, write `BLOCKED: <reason and evidence>` indented under the task and continue with tasks that don't depend on it. In single-run mode, stop and report.
-11. Never perform or self-certify a USER TASK.
+11. Never perform or self-certify a USER TASK. In delegated mode, send a USER TASK to the delegate as `../build/references/delegated.md` says; nobody but the human performs it.
 12. Prefer one implementation commit for a small, cohesive feature. Split only at meaningful, independently understandable boundaries that improve reviewability, readability, rollback safety, or separate distinct concerns. Larger work should use small, coherent commits where those boundaries provide value. Multiple steps or tasks alone do not justify multiple commits. Follow explicit commit groupings in the plan; otherwise state the grouping before implementation.
 13. Follow the repository's commit message convention; without one, use `<area>: <imperative summary>`.
 14. Record the base commit before the first change: `git rev-parse HEAD`. In loop mode, write it as `Base: <hash>` right under the title of `TODO.md` the first time you start, and reuse an existing `Base:` line when resuming.

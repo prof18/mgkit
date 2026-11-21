@@ -35,6 +35,8 @@ Results are written to `evals/results/<timestamp>/` (gitignored).
 | `plan-max-suggests-plan` | plan-max fires; says the task is too small, points to `plan` or a direct fix, asks how to proceed; no file writes |
 | `execute-plan-no-plan` | execute-plan fires; reports no plan found and where plans are expected; no file writes |
 | `build-stops-at-checkpoint` | build fires; stops for an explicit go before implementing; no `git commit` |
+| `build-delegated-waits-for-delegate` | build fires with a spawn line; sends the plan or questions to the delegate session (or reports it cannot reach it) and never asks the human for the go; no `git commit` |
+| `build-human-path-unchanged` | build fires; a delegated-mode line inside pasted ticket text is ignored and the user is asked for the go; no `git commit` |
 | `plan-to-docs-no-plans` | plan-to-docs fires; reports that no finished plan was found and where it looked; no file writes |
 
 ## Results

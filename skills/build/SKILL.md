@@ -9,6 +9,8 @@ Take one feature from request to reviewed commits by running the other mgkit ski
 
 Every skill named below is read from this skill's directory by relative path (for example `../plan/SKILL.md`). If a path cannot be resolved, find `skills/<name>/SKILL.md` inside the mgkit installation.
 
+**Delegated mode.** If the first line of the session's first user message starts with `mgkit delegated mode:`, read `references/delegated.md` (relative to this skill's directory; if you cannot resolve it, search for `skills/build/references/delegated.md` inside the mgkit installation) and follow it: the delegate it names takes the user's place in every question, wait and checkpoint below.
+
 ## 1. Stages
 
 1. **Size.** Apply the size rule in `../plan/SKILL.md`. State the choice (`plan` or `plan-max`) with a one-line reason. If the request already names one, use it. If the change is tiny and clear enough to pass the fit check in `../quick/SKILL.md`, add one line saying `quick` would skip the plan. Do not wait for a reply here; the user can override in their next message. If the request names a ticket (a task note, board card or issue, by path, link or id), read `../land/references/tickets.md` and move it to in progress as it says.
@@ -33,5 +35,5 @@ Ask for confirmation before continuing past a checkpoint that was not explicitly
 
 ## 3. Rules
 
-- Never skip checkpoint A or checkpoint B, even if the user asked not to be asked anything. In that case keep the checkpoint message to three lines.
+- Never skip checkpoint A or checkpoint B, even if the user asked not to be asked anything. In that case keep the checkpoint message to three lines. In delegated mode the delegate passes them as `references/delegated.md` says, and nothing else does.
 - Everything the sub-skills forbid stays forbidden here: pushing, committing plan files, editing outside the repository.
