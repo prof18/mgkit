@@ -65,7 +65,7 @@ If only the overlap fails, wait to reply until that other worker is merged. Othe
 
 ## 6. Checkpoint B
 
-When the worker reports ready, take the head commit from its request. In PR mode, the PR's `headRefOid` must equal it; in local mode, `git rev-parse <worker branch>` must. If not, reply `refresh <request id>`: the worker then sends a new request for its current head.
+When the worker reports ready, take the head commit from its request. In PR mode, the PR's `headRefOid` must equal it; in local mode, `git rev-parse <worker branch>` must. If not, reply `refresh <request id>`: the worker then sends a new request for its current head. If the refreshed request still disagrees with the PR or branch head, someone else moved the branch: escalate (section 7) with both hashes instead of refreshing again.
 
 Then read `../review-and-fix/SKILL.md` and run it blind and review-only on exactly that commit: in PR mode on the PR with that head commit passed, in local mode on `<base>...<head>`. Give it the ticket and the named docs, never the plan. Record the reviewed head commit in the roster, and judge the findings it returns. First compare them with the outcomes the worker returned in its request: when a reviewer repeats a finding the worker rejected on unchanged code, verify the worker's evidence, drop the finding if the evidence holds, and treat it as `escalate` if the disagreement stays open. The rules below apply to the findings that remain.
 

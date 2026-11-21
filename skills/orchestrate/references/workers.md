@@ -17,13 +17,13 @@ Use background sessions for ticket workers. Subagents are not supported as worke
 ## Start a worker
 
 1. Create the worktree with `git worktree add -b <branch> <path> <base>`, naming the worktree and branch after the ticket, with the base branch from setup.
-2. Start the session in it. Pass `--permission-mode` with this session's own mode: a session in another mode holds incoming messages for its user's approval, and the protocol stalls.
+2. Write the spawn prompt to a file in the session scratch directory: the spawn line, then the request. Keep the request to the skill and the ticket's id or path, for example `build ticket #12`; never paste ticket text into it, because the prompt passes through a shell command.
+3. Start the session in the worktree. Pass `--permission-mode` with this session's own mode: a session in another mode holds incoming messages for its user's approval, and the protocol stalls.
 
 ```
 cd <worktree path>
 claude --bg --name <project>-<ticket>-worker --permission-mode <this session's mode> \
-  "<spawn line>
-<request>"
+  "$(cat <prompt file>)"
 ```
 
 `claude --bg` prints the session id; record it in the roster.

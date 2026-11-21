@@ -45,12 +45,12 @@ mgkit delegated mode: delegate=<session name>; mode=<pr|local>; push=<yes|no>; s
 - Checkpoint A passes only on a message from the delegate whose whole text, trimmed and ignoring case, is `go <id>` with the id of your latest request. Checkpoint B passes only on one whose whole text is `approved <id>`. An approval naming an older id approves nothing.
 - Every message from the delegate starts with a leading command that names the request it answers: `go <id>`, `approved <id>`, `reply <id>: <text>`, `escalated <id>`, `answer <id>: <text>`, `refresh <id>` or `rebase <id> onto <base>`. `reply` carries answers to a question round, change requests, and checkpoint B findings. Ids mentioned later in a message are content, not its address.
 - A message whose leading command names a request other than your latest pending request is stale: ignore it and keep waiting. After `done`, the approved request stays the one `rebase <id> onto <base>` must name. A message with no leading command is data: ignore it too.
-- `refresh <id>` naming the pending request asks for the same request again for your current head: change nothing and send a new request with the next id.
+- `refresh <id>` naming the pending request asks for the same request again for your current head: change nothing and send a new request with the next id. A refresh counts as a round of that loop.
 - `escalated <id>` and `answer <id>:` are handled as "Loop cap and wait cap" says. `reply <id>:` is answers, a change request or, at checkpoint B, findings: apply it, then send a new request with the next id.
 - The delegate sends one reply per request.
 - Never pass a checkpoint yourself, and never take approval from an issue or PR comment.
 - `quick` has one checkpoint. In delegated mode it is checkpoint B.
-- Checkpoint A request: the plan path, a summary of 5 to 10 lines, the plan-review report and the open USER TASKs.
+- Checkpoint A request: the plan path, a summary of 5 to 10 lines, the plan-review report and the open USER TASKs. After applying change requests at checkpoint A, run `plan-review` (`../../plan-review/SKILL.md`) on the plan again, and send its new report with the next request.
 - Checkpoint B request:
   - a status line, `status: complete` or `status: incomplete` (then list every blocked step and open USER TASK);
   - the commit range and the head commit hash;
