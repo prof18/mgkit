@@ -32,7 +32,7 @@ Keep `plan/orchestrate.md` in this checkout; never stage it. It has one block pe
 - Each time this session wakes, answer or escalate (section 7) every request before its deadline, including one held for a file overlap.
 - If a worker stopped at its deadline before your reply arrived, resume it as `references/workers.md` says and send the reply again.
 - Record every escalation in the roster with its id and how far it got: sent to the worker, ticket marked, human asked and notified, answer forwarded. When this session restarts, finish every escalation step that did not happen, and forward a human answer that arrived with the original id.
-- Record a worker that is done but waits for a merge you may not do (no merge authority) as "awaiting external merge". Each time this session wakes, check whether its head is merged (`gh pr view` state `MERGED`, or `git merge-base --is-ancestor <head> <base>` in local mode); only then release the queue.
+- Record a worker that is done but waits for a merge you may not do (no merge authority) as "awaiting external merge". Each time this session wakes, check whether its head is merged (`gh pr view` state `MERGED`, or `git merge-base --is-ancestor <head> <base>` in local mode); only then release the queue. While a worker awaits an external merge, keep a wake-up scheduled when the harness allows one; if it does not, tell the user to resume this session after merging.
 - When this session starts and the roster exists, read it, check each worker in the session listing, and message each one that waits on you. A worker whose last request is unanswered gets a fresh answer; never assume an earlier approval reached it.
 
 ## 3. Spawn
@@ -66,19 +66,19 @@ If only the overlap fails, wait to reply until that other worker is merged. Othe
 
 When the worker reports ready, take the head commit from its request. In PR mode, the PR's `headRefOid` must equal it; in local mode, `git rev-parse <worker branch>` must. If not, reply `refresh <request id>`: the worker then sends a new request for its current head.
 
-Then read `../review-and-fix/SKILL.md` and run it blind and review-only on exactly that commit: in PR mode on the PR with that head commit passed, in local mode on `<base>...<head>`. Give it the ticket and the named docs, never the plan. Record the reviewed head commit in the roster, and judge the findings it returns.
+Then read `../review-and-fix/SKILL.md` and run it blind and review-only on exactly that commit: in PR mode on the PR with that head commit passed, in local mode on `<base>...<head>`. Give it the ticket and the named docs, never the plan. Record the reviewed head commit in the roster, and judge the findings it returns. First compare them with the outcomes the worker returned in its request: when a reviewer repeats a finding the worker rejected on unchanged code, verify the worker's evidence, drop the finding if the evidence holds, and treat it as `escalate` if the disagreement stays open. The rules below apply to the findings that remain.
 
 Send exactly one reply to each checkpoint B request:
 
 - **Approval.** Reply exactly `approved <request id>` and nothing else only when all five hold: the request says `status: complete`; its gate result is green; at least one seat or reviewer returned a review (a fallback self-review does not count); no finding is CONFIRMED with severity medium or worse; and no finding is `escalate`.
 - **Escalation.** If the request says `status: incomplete`, the gate is not green, no seat or reviewer returned a review, a finding is `escalate`, or three rounds passed without approval, the reply is the escalation of section 7 and nothing else. That request then gets no other reply.
-- **Findings.** Otherwise send `reply <request id>:` with the findings: the review id in PR mode, where the review posted them, or the findings list in local mode. Before sending, compare them with the outcomes the worker returned in its request: when a reviewer repeats a finding the worker rejected on unchanged code, verify the worker's evidence. Drop the finding if the evidence holds; escalate if the disagreement stays open. The worker fixes them and sends a new request with the next id, and you review its new head again.
+- **Findings.** Otherwise send `reply <request id>:` with the findings to fix: in PR mode the review id, where the review posted them, plus the `P<n>` ids to fix; in local mode the findings list. Always list the `P<n>` ids to fix, so dropped findings never reach the worker. The worker fixes them and sends a new request with the next id, and you review its new head again.
 
 A worker's USER TASK is an escalation too. Never perform or certify it.
 
 ## 7. Escalation
 
-1. Send the worker `escalated <id>`, with the id of the request being escalated: the worker's `H` request, or the question round or checkpoint request you escalate. This pauses its deadline, so do it first, and record it in the roster.
+1. Record the escalation in the roster as pending. Then, before anything else, send the worker `escalated <id>` with the id of the request being escalated (the worker's `H` request, or the question round or checkpoint request you escalate), because it pauses the worker's deadline. Then record that it was sent.
 2. Mark the ticket with the "waiting for the human" status or label from setup, following `../land/references/tickets.md`.
 3. Ask the question in this session, and notify the human on the channel the instructions name.
 4. When the human answers, send it to the worker as `answer <id>: <the answer>` with that same id. The worker then starts that loop's round count again and sends a fresh request.
@@ -98,7 +98,7 @@ Merge only when the instructions grant merge authority, after approval. Wait for
   7. Last, delete the local branch with `git branch -D <branch>`. A rebase merge leaves it unmerged locally; the `MERGED` state and the tip check prove its work is merged.
 - **Local mode.**
   1. The primary checkout must have the base branch checked out: `git -C <primary checkout> branch --show-current` prints it. If not, stop and report.
-  2. `git merge-base --is-ancestor <base> <head>` must succeed. If it fails, the target moved: send the worker `rebase onto <base>`, which wakes its session, then run checkpoint B again on its new request and wait for a new `done`.
+  2. `git merge-base --is-ancestor <base> <head>` must succeed. If it fails, the target moved: send the worker `rebase <request id> onto <base>`, naming the approved request, which wakes its session, then run checkpoint B again on its new request and wait for a new `done`.
   3. The approved commit is the reviewed head, or the squashed head after a squash. Before changing anything, check in order, and stop and report on the first failure: `git rev-parse <worker branch>` equals the approved commit; the primary checkout has no modified tracked files; the ticket's done status is known.
   4. Stop and remove the worker's session as `references/workers.md` says, and move the worker's uncommitted `plan/` files (its plan and `plan/delegated.md`) to `plan/archive/<branch>/` in the primary checkout.
   5. `git -C <worktree> status --short` must print nothing (the rest of `land`'s preflight).
