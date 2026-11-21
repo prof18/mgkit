@@ -1,6 +1,6 @@
 ---
 name: review-and-fix
-description: "Run a budget-conscious, agent-assisted codebase review and remediation loop. Use when the user asks to review and fix, run a code review pass, or review a whole repository, branch, PR, or large change set for bugs, performance issues, accessibility problems, build/release risks, or general quality problems; to split review work across subagents; to grade, filter, and fix validated findings; or to run another review pass. Defaults: each review pass is done by a panel of the other installed agent CLIs (Claude Code, Codex, Pi) moderated by the main agent for up to 3 rounds, with findings shown per author in Difftray when it is available, or by 1-3 mid-tier reviewer subagents when no other CLI is installed; main-agent verification and grading, a single fix worker. Passes repeat on their own while a pass still fixes a medium-or-worse finding, at most 3, reusing the session findings ledger; say single pass for one."
+description: "Run a budget-conscious, agent-assisted codebase review and remediation loop. Use when the user asks to review and fix, run a code review pass, or review a whole repository, branch, PR, or large change set for bugs, performance issues, accessibility problems, build/release risks, or general quality problems; to grade, filter, and fix validated findings; or to run another review pass. Defaults: each pass is done by a panel of the other installed agent CLIs (Claude Code, Codex, Pi) moderated by the main agent for up to 3 rounds, with findings shown per author in Difftray when available, or by 1-3 mid-tier reviewer subagents otherwise; main-agent verification and grading, a single fix worker. Passes repeat while a pass still fixes a medium-or-worse finding, at most 3; say single pass for one. Given a PR, posts findings as PR review comments, replies and resolves them; checks a linked ticket; also runs blind and review-only, or fixes posted findings, for an orchestrator."
 ---
 
 # Review and Fix
@@ -48,7 +48,7 @@ F4  discarded  Utils.kt:40       performance/-      low confidence: pattern matc
 F5  escalate   Db schema         correctness/high   needs migration decision from user
 ```
 
-Statuses: `fixed`, `rejected` (verified false), `discarded` (low confidence or below threshold), `follow-up` (real but not fixed), `escalate` (needs a user decision).
+Statuses: `fixed`, `rejected` (verified false), `discarded` (low confidence or below threshold), `follow-up` (real but not fixed), `escalate` (needs a user decision), and `accepted` (passed the gate, but not fixed in this run: review-only mode, or a fix that could not run).
 
 From the second pass on, and whenever the user asks for another run in the same session, pass the ledger to reviewers as the skip list. A finding matching a `rejected` or `discarded` entry is dropped without re-verification unless the code changed. A finding matching a `fixed` entry is a regression and gets priority.
 
@@ -66,8 +66,9 @@ Every finding carries three grades. Reviewers propose them; the main agent sets 
 - **high:** user-visible incorrect behavior, meaningful performance regression, accessibility failure on a primary flow.
 - **medium:** incorrect behavior in a real but secondary path, stale automation, fragile code with a concrete trigger.
 - **low:** minor polish, unlikely edge case, cleanup.
+- For `spec`: a missing acceptance criterion is high; a change outside the ticket is medium.
 
-**Category:** correctness, concurrency, performance, security, accessibility, build/release, tests.
+**Category:** correctness, concurrency, performance, security, accessibility, build/release, tests, spec (the change against its ticket).
 
 **Verdict** (main agent only): `CONFIRMED` (traced and real), `PLAUSIBLE` (likely but not fully proven), `REJECTED` (false, stale, or already handled).
 
@@ -110,6 +111,22 @@ Pause and reclassify when a narrow fix turns into an architecture or process rew
 
 A clean worktree is not proof of a clean codebase.
 
+## Modes
+
+The caller turns these on; without them the skill works as described everywhere else.
+
+- **Ticket:** when the caller names a ticket, or PR mode finds a linked issue, write its text to a file in the session scratch directory during the Baseline step and give its path to every reviewer and seat, in every mode.
+
+- **PR mode:** on when the caller gives a PR number or URL. Read `references/pr-mode.md` and follow it. Difftray is not used. Give every merged finding a `P<n>` id and its sources (`driver`, a seat name, `reviewer-<n>` for a subagent), with or without a panel.
+- **Blind:** on when the caller asks for it.
+  - Create a detached worktree of the reviewed commit in the session scratch directory with `git worktree add --detach <scratch>/blind-<short sha>-<output of date +%s> <sha>`, so every run gets its own path. Give it to every seat or reviewer as the repository root.
+  - Write the ticket text to a file in the round directory. Give reviewers only the diff, that ticket file and the documents the caller names, as absolute paths, never a plan, plan discussion or worker summary.
+  - Skip your own review and only verify what the seats or reviewers report. If no panel seat is available and you cannot start subagents, review yourself and mark the report "not blind".
+  - The report states how many seats or reviewers returned a review. A fallback self-review never counts as one, so in that case the count is zero.
+  - Remove that run's worktree with `git worktree remove <path>` at the end.
+- **Review-only:** on when the caller asks for it. Run Workflow steps 1 to 4, then panel round 2 on the dispositions with an empty `changes.diff`. For an objection you accept, change the disposition after verifying it (step 4), never by fixing. Skip steps 5 and 6 and run one pass; a finding that would be fixed gets the disposition `accepted`. Post the final dispositions in PR mode, or return them in the report. Change no file.
+- **Fix-posted:** on when the caller asks to fix findings already posted, naming the review id in PR mode. In PR mode, the merged findings are that review's threads (selected as `references/pr-mode.md` says) plus the findings in that review's body. In local mode, they are the findings listed in the delegate's message. Verify each one (step 4) and fix the ones that hold (steps 5 and 6). In PR mode, reply as `references/pr-mode.md` says, including evidence for every finding you reject; body findings get their reply in the summary comment. In local mode, the outcomes go back to the delegate in the next checkpoint B request: each finding fixed (with its commit), or rejected with its evidence. Run one pass.
+
 ## Release Branch Discipline
 
 On release, beta, hotfix, signing, notarization, packaging, or store-submission work:
@@ -143,6 +160,7 @@ On release, beta, hotfix, signing, notarization, packaging, or store-submission 
    - Assign final verdict, confidence, severity, category. Apply the Gate and Scope Governor.
    - For each accepted bug class, check sibling surfaces in scope now so siblings join the same fix batch.
    - Write every outcome to the ledger.
+   - In delegated mode, an `escalate` finding goes to the delegate (see `../build/references/delegated.md`).
 
 5. **Fix.**
    - If nothing passed the gate, skip to step 7.
@@ -190,9 +208,10 @@ If the user asks for a "deep" or parallel review (e.g. two models on the same ba
 Review pass for <repo path>. Focus only on <scope>. Read AGENTS.md / CLAUDE.md and relevant project rules first. Do not edit files.
 Skip these already-handled findings: <ledger skip list>.
 Report only concrete bugs, performance, security, accessibility, or build/release issues. Do not report style, naming, or speculative hardening.
+If a ticket is given (<ticket path or "none">), also check that the change meets its goal and every acceptance criterion and does nothing outside them; report gaps as category spec.
 For each finding return:
 - location: file:line
-- category: correctness | concurrency | performance | security | accessibility | build/release | tests
+- category: correctness | concurrency | performance | security | accessibility | build/release | tests | spec
 - severity: critical | high | medium | low
 - confidence: high (full path traced or repro) | medium (traced, depends on stated runtime assumption) | low (pattern match / speculation)
 - evidence: the traced code path or repro, in a few lines

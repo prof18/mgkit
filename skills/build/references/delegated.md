@@ -55,6 +55,7 @@ mgkit delegated mode: delegate=<session name>; mode=<pr|local>; push=<yes|no>; s
   - the gate result and the review summary;
   - in PR mode, the PR URL; in local mode, the worktree path and branch.
 - In PR mode at checkpoint B, push the branch first, then open the PR (see "Git rights"), then send the request.
+- Between the checkpoint B request and the approval, the delegate can send findings. In PR mode its message names a review id: run `review-and-fix` (`../../review-and-fix/SKILL.md`) in fix-posted mode on the PR with that review id. In local mode, run it in fix-posted mode on the findings listed in the message. Then send a new checkpoint B request with the next id, the new head commit hash and the outcome of each finding: fixed (with its commit) or rejected (with its evidence).
 - Delegated mode does not say who reviews the code at checkpoint B. The delegate decides that.
 
 ## Loop cap and wait cap
