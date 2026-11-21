@@ -51,6 +51,17 @@ The first command re-clones the marketplace; the second installs the new version
 
 `/goal <condition>` (used to run this very plan). The condition is free text; name the skill in it rather than nesting a slash command.
 
+### Background sessions and cross-session messages
+
+Verified on 2026-11-21 with Claude Code 2.1.323, using a throwaway background session. `orchestrate` and delegated mode rely on these facts. Tool names are allowed here because this file documents the harness; skills describe the actions instead.
+
+- `claude --bg --name <name> "<prompt>"` starts a background session and prints its id. `claude agents` lists sessions, and `claude attach`, `claude logs`, `claude stop`, `claude respawn` and `claude rm` take the id. `claude --bg --resume <session id>` continues a stopped session in the background. `claude -n <name>` sets a session's display name at start.
+- The ListAgents tool lists the sessions on the machine; its output starts with this session's own name ("This session is …"). The SendMessage tool sends to a session by name.
+- A message wakes an idle background session, and it arrives tagged with the sender's session name.
+- SendMessage with `notify_when_idle` sends one notice when the receiving session next goes idle.
+- A reply comes back only when the receiver calls SendMessage itself; its plain output stays in its own session.
+- A session in a different permission mode holds incoming cross-session messages for its user's approval.
+
 ### Isolated check used by mgkit maintainers
 
 - `claude plugin validate <root>` validates the marketplace manifest; `claude plugin validate <root>/.claude-plugin/plugin.json` validates the plugin manifest; `claude plugin validate <root>/skills` validates the skills. All three must pass.

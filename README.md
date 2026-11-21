@@ -34,6 +34,7 @@ roast ──▶ plan / plan-max ──▶ plan-review ──▶ [you check the p
 | `quick` | Implements a small, clear change without a plan (test first, gate, commit), then runs a repeating review-and-fix and stops for you; switches to `build` on its own, without asking, if the change is or grows too big; moves a named ticket to in progress | The change is easy and a plan would cost more than the work |
 | `squash` | Tidies a branch's commits into the shape that reads best: fixes fold into the commit they fix, separate concerns stay separate, the code stays identical | Review left fix commits on top of the work |
 | `land` | Fast-forwards the primary checkout to a worktree branch (rebasing and rerunning the gate if needed), removes the worktree and branch, marks the ticket done | You approved the code and want it merged locally |
+| `orchestrate` | Experimental. Runs mgkit workers as their delegate: spawns one background session per ticket, answers their questions, passes their checkpoints, reviews their change blind, merges only when allowed | You want agents to work through tickets without you at every checkpoint |
 | `plan-to-docs` | Turns finished plans into present-tense docs written from the code, points `AGENTS.md` at them, and deletes the plans | A plan is done and should become documentation |
 | `explain-commit` | Visual walkthrough of a commit, range, PR or diff | You need to understand a change |
 | `worktree-task` | Does a task in an isolated Git worktree, merges it back, cleans up | You want work isolated from your checkout |
@@ -57,6 +58,16 @@ MGKIT_PANEL_TIMEOUT=
 ```
 
 When the pi seat fails, for example on a rate limit or a stall that hits the timeout, it runs once more with `MGKIT_PANEL_PI_FALLBACK_MODEL`, and the report names the fallback and why it was needed. The pi seat runs with every extension off; list in `MGKIT_PANEL_PI_EXTENSIONS` the ones it needs, such as an extension that provides a model's provider. A seat is stopped after `MGKIT_PANEL_TIMEOUT` seconds, one hour by default; `0` turns the limit off. With no other CLI installed, both skills review on their own as before. The panel's round cap takes inspiration from [hamen/ship-feature](https://github.com/hamen/ship-feature).
+
+## Delegated mode (experimental)
+
+A worker session runs `build`, `quick`, `plan` or `plan-max` in delegated mode when the first line of its first message is a spawn line. An orchestrator session running the `orchestrate` skill then answers its questions and passes its checkpoints in your place, and escalates to you what its docs cannot settle and every checkpoint it cannot pass. Without the line, the worker skills behave as before.
+
+```
+mgkit delegated mode: delegate=<session name>; mode=<pr|local>; push=<yes|no>; squash=<yes|no>; wait=<hours>h; base=<branch>; ticket=<id, link or path>
+```
+
+Approvals travel only as direct session messages that name the request they answer; issue and PR comments are the record, never the signal. It currently needs Claude Code background sessions. The protocol is in `skills/build/references/delegated.md` and may change between 0.0.x releases.
 
 ## Install
 
