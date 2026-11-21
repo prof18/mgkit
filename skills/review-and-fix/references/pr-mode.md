@@ -96,7 +96,7 @@ gh api graphql -f owner=<owner> -f repo=<repo> -F pr=<n> -F query=@<threads.grap
 
 ## After the fix batch
 
-- **Push first, only for fixes.** A `fixed` reply names a commit, so it needs that commit pushed. Push the branch only when the caller's instructions allow pushing; in delegated mode that means `push=yes`. If pushing is not allowed, neither reply to nor resolve a `fixed` thread, and report that those threads wait for a push. Every other reply needs no push.
+- **Push first, only for fixes.** A `fixed` reply names a commit, so it needs that commit pushed. Push the branch only when the caller's instructions allow pushing; in delegated mode that means `push=yes`. If pushing is not allowed, neither reply to nor resolve a `fixed` thread, and report that those threads wait for a push. Every other reply needs no push. Without a push the next pass would review a head the PR does not have, so stop after this pass and say so in the report.
 - Then handle each thread by its finding's ledger status. Skip a reply that already exists (see "Existing replies") and only do what is still missing.
   - `fixed`: reply `Fixed in <short hash>: <what changed>`. Resolve the thread only after the push succeeded and that reply exists.
   - `follow-up`: reply with the reason and leave the thread open.

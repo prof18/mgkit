@@ -31,6 +31,8 @@ Keep `plan/orchestrate.md` in this checkout; never stage it. It has one block pe
 - When the harness lets this session schedule a wake-up, keep one scheduled before the earliest open deadline.
 - Each time this session wakes, answer or escalate (section 7) every request before its deadline, including one held for a file overlap.
 - If a worker stopped at its deadline before your reply arrived, resume it as `references/workers.md` says and send the reply again.
+- Record every escalation in the roster with its id and how far it got: sent to the worker, ticket marked, human asked and notified, answer forwarded. When this session restarts, finish every escalation step that did not happen, and forward a human answer that arrived with the original id.
+- Record a worker that is done but waits for a merge you may not do (no merge authority) as "awaiting external merge". Each time this session wakes, check whether its head is merged (`gh pr view` state `MERGED`, or `git merge-base --is-ancestor <head> <base>` in local mode); only then release the queue.
 - When this session starts and the roster exists, read it, check each worker in the session listing, and message each one that waits on you. A worker whose last request is unanswered gets a fresh answer; never assume an earlier approval reached it.
 
 ## 3. Spawn
@@ -44,7 +46,7 @@ Read `references/workers.md` and follow it to start one worker per ticket in its
 
 ## 4. Answering questions
 
-Answer each `Q` request from the named docs, in the worker's question format, and say which doc settles each answer. If no doc settles a product or architecture decision, escalate (section 7). Never invent a product decision.
+Answer each `Q` request with `reply <id>:` from the named docs, in the worker's question format, and say which doc settles each answer. If no doc settles a product or architecture decision, escalate (section 7). Never invent a product decision.
 
 ## 5. Checkpoint A
 
@@ -58,7 +60,7 @@ Read the plan and approve it only when every item holds:
 
 Then reply with exactly `go <request id>` and nothing else, using the id of the worker's latest request. Mirror the decision: comment `[mgkit] go <request id>` on the ticket when it is a hosted issue. The direct message stays the only signal.
 
-If only the overlap fails, wait to reply until that other worker is merged. Otherwise reply with the failing items as change requests. After three rounds the worker sends a `needs human` request; treat it as an escalation.
+If only the overlap fails, wait to reply until that other worker is merged. Otherwise send the failing items as change requests with `reply <request id>:`. After three rounds the worker sends a `needs human` request; treat it as an escalation.
 
 ## 6. Checkpoint B
 
@@ -70,7 +72,7 @@ Send exactly one reply to each checkpoint B request:
 
 - **Approval.** Reply exactly `approved <request id>` and nothing else only when all five hold: the request says `status: complete`; its gate result is green; at least one seat or reviewer returned a review (a fallback self-review does not count); no finding is CONFIRMED with severity medium or worse; and no finding is `escalate`.
 - **Escalation.** If the request says `status: incomplete`, the gate is not green, no seat or reviewer returned a review, a finding is `escalate`, or three rounds passed without approval, the reply is the escalation of section 7 and nothing else. That request then gets no other reply.
-- **Findings.** Otherwise the reply carries the findings: the review id in PR mode, where the review posted them, or the findings list in local mode. The worker fixes them and sends a new request with the next id, and you review its new head again.
+- **Findings.** Otherwise send `reply <request id>:` with the findings: the review id in PR mode, where the review posted them, or the findings list in local mode. Before sending, compare them with the outcomes the worker returned in its request: when a reviewer repeats a finding the worker rejected on unchanged code, verify the worker's evidence. Drop the finding if the evidence holds; escalate if the disagreement stays open. The worker fixes them and sends a new request with the next id, and you review its new head again.
 
 A worker's USER TASK is an escalation too. Never perform or certify it.
 
