@@ -20,7 +20,7 @@ gh pr view <n> -R <host>/<owner>/<repo> \
 
 Pin every pass to fixed commits, so the reviewed diff and the posted `commit_id` always match:
 
-1. **Expected head.** In the first pass it is the head commit the caller passes, or `headRefOid` when the caller passes none. After a pass pushes fixes, it is the commit that pass pushed.
+1. **Expected head.** In the first pass it is the head commit the caller passes, or `headRefOid` when the caller passes none. In fix-posted mode it is the `commit_id` of the named review; if the PR head or the local `HEAD` differs from it, change nothing and report it (in delegated mode, send a new checkpoint B request instead). After a pass pushes fixes, it is the commit that pass pushed.
 2. **Fetch** into two refs unique to this run, where the run id is the one in the review tag (see "Posting a pass"):
 
    ```

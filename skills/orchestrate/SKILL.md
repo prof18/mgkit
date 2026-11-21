@@ -26,13 +26,14 @@ This session's name is the address workers reply to. Read it from the harness's 
 
 ## 2. Roster
 
-Keep `plan/orchestrate.md` in this checkout; never stage it. It has one block per worker: session name, ticket, worktree path, branch, mode, current checkpoint, the pending request with its id and the time it arrived, its deadline (from the request's `deadline:` line), the reviewed head commit, and the approvals sent. Update it on every event.
+Keep `plan/orchestrate.md` in this checkout; never stage it. It has one block per worker: session name, ticket, worktree path, branch, mode, current checkpoint, the pending request with its id and the time it arrived, its deadline (from the request's `deadline:` line), the reviewed head commit, and the exact text of every reply you send, keyed by request id. Write the reply into the roster before you send it. Update it on every event.
 
 - When the harness lets this session schedule a wake-up, keep one scheduled before the earliest open deadline.
 - Each time this session wakes, answer or escalate (section 7) every request before its deadline, including one held for a file overlap.
 - If a worker stopped at its deadline before your reply arrived, resume it as `references/workers.md` says and send the reply again.
 - Record every escalation in the roster with its id and how far it got: sent to the worker, ticket marked, human asked and notified, answer forwarded. When this session restarts, finish every escalation step that did not happen, and forward a human answer that arrived with the original id.
 - Record a worker that is done but waits for a merge you may not do (no merge authority) as "awaiting external merge". Each time this session wakes, check whether its head is merged (`gh pr view` state `MERGED`, or `git merge-base --is-ancestor <head> <base>` in local mode); only then release the queue. While a worker awaits an external merge, keep a wake-up scheduled when the harness allows one; if it does not, tell the user to resume this session after merging.
+- A request that arrives with an id you already answered is a resend after a worker restart: send the latest recorded reply for that id again, unchanged (after an escalation, that is the human's answer once it exists, otherwise `escalated <id>`).
 - When this session starts and the roster exists, read it, check each worker in the session listing, and message each one that waits on you. A worker whose last request is unanswered gets a fresh answer; never assume an earlier approval reached it.
 
 ## 3. Spawn
