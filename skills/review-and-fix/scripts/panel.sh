@@ -10,7 +10,7 @@ set -euo pipefail
 # A seat still running after this many seconds is stopped. The slowest real review seen took about 40 minutes;
 # a stalled model never ends on its own.
 DEFAULT_TIMEOUT=3600
-KNOWN_KEYS="MGKIT_PANEL_SEATS MGKIT_PANEL_CLAUDE_MODEL MGKIT_PANEL_CODEX_MODEL MGKIT_PANEL_PI_MODEL MGKIT_PANEL_PI_FALLBACK_MODEL MGKIT_PANEL_PI_EXTENSIONS MGKIT_PANEL_TIMEOUT"
+KNOWN_KEYS="MGKIT_PANEL_SEATS MGKIT_PANEL_CLAUDE_MODEL MGKIT_PANEL_CODEX_MODEL MGKIT_PANEL_CODEX_EFFORT MGKIT_PANEL_PI_MODEL MGKIT_PANEL_PI_FALLBACK_MODEL MGKIT_PANEL_PI_EXTENSIONS MGKIT_PANEL_TIMEOUT"
 
 usage() {
   echo "usage: panel.sh seats --driver NAME | panel.sh run --driver NAME --prompt-file FILE --out-dir DIR [--repo DIR]" >&2
@@ -38,7 +38,9 @@ seat_model() {
     codex) v="${MGKIT_PANEL_CODEX_MODEL:-}" ;;
     pi) v="${MGKIT_PANEL_PI_MODEL:-}" ;;
   esac
-  printf '%s\n' "${v:-default}"
+  v="${v:-default}"
+  if [ "$1" = codex ] && [ -n "${MGKIT_PANEL_CODEX_EFFORT:-}" ]; then v="$v, effort: $MGKIT_PANEL_CODEX_EFFORT"; fi
+  printf '%s\n' "$v"
 }
 
 # list_seats DRIVER: one line per configured seat, "seat<TAB>available|skipped<TAB>model or reason".
@@ -75,6 +77,8 @@ exec_seat() {
       # --skip-git-repo-check: a plan is often reviewed before its folder is a git repository; the seat writes nothing.
       args=(exec -s read-only --ephemeral --ignore-user-config --disable apps --skip-git-repo-check -o "$out/$seat.md")
       if [ -n "${MGKIT_PANEL_CODEX_MODEL:-}" ]; then args+=(-m "$MGKIT_PANEL_CODEX_MODEL"); fi
+      # --ignore-user-config drops config.toml's effort too, so it is passed as an override.
+      if [ -n "${MGKIT_PANEL_CODEX_EFFORT:-}" ]; then args+=(-c "model_reasoning_effort=$MGKIT_PANEL_CODEX_EFFORT"); fi
       exec codex "${args[@]}" - <"$prompt" >"$out/$seat.log" 2>&1
       ;;
     pi)

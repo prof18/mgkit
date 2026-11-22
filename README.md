@@ -51,13 +51,15 @@ Seats use each CLI's default model; the Codex seat skips your `config.toml` so i
 
 ```
 MGKIT_PANEL_SEATS=claude codex pi
+MGKIT_PANEL_CODEX_MODEL=
+MGKIT_PANEL_CODEX_EFFORT=low
 MGKIT_PANEL_PI_MODEL=zai/glm-5.3
 MGKIT_PANEL_PI_FALLBACK_MODEL=xai/grok-4.7
 MGKIT_PANEL_PI_EXTENSIONS=
 MGKIT_PANEL_TIMEOUT=
 ```
 
-When the pi seat fails, for example on a rate limit or a stall that hits the timeout, it runs once more with `MGKIT_PANEL_PI_FALLBACK_MODEL`, and the report names the fallback and why it was needed. The pi seat runs with every extension off; list in `MGKIT_PANEL_PI_EXTENSIONS` the ones it needs, such as an extension that provides a model's provider. A seat is stopped after `MGKIT_PANEL_TIMEOUT` seconds, one hour by default; `0` turns the limit off. With no other CLI installed, both skills review on their own as before. The panel's round cap takes inspiration from [hamen/ship-feature](https://github.com/hamen/ship-feature).
+When the pi seat fails, for example on a rate limit or a stall that hits the timeout, it runs once more with `MGKIT_PANEL_PI_FALLBACK_MODEL`, and the report names the fallback and why it was needed. The pi seat runs with every extension off; list in `MGKIT_PANEL_PI_EXTENSIONS` the ones it needs, such as an extension that provides a model's provider. A seat is stopped after `MGKIT_PANEL_TIMEOUT` seconds, one hour by default; `0` turns the limit off. `MGKIT_PANEL_CODEX_EFFORT` sets the Codex seat's reasoning effort, since it does not read the one in your `config.toml`. With no other CLI installed, both skills review on their own as before. The panel's round cap takes inspiration from [hamen/ship-feature](https://github.com/hamen/ship-feature).
 
 ## Delegated mode (experimental)
 

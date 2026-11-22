@@ -3,7 +3,7 @@
 source "$(dirname "$0")/lib.sh"
 PANEL="$SCRIPTS_DIR/../skills/review-and-fix/scripts/panel.sh"
 
-unset MGKIT_PANEL_SEATS MGKIT_PANEL_CLAUDE_MODEL MGKIT_PANEL_CODEX_MODEL MGKIT_PANEL_PI_MODEL MGKIT_PANEL_TIMEOUT
+unset MGKIT_PANEL_SEATS MGKIT_PANEL_CLAUDE_MODEL MGKIT_PANEL_CODEX_MODEL MGKIT_PANEL_CODEX_EFFORT MGKIT_PANEL_PI_MODEL MGKIT_PANEL_TIMEOUT
 export MGKIT_PANEL_CONFIG=/nonexistent/panel.conf
 
 # One root for every stub dir, registered here: new_stubs runs in $(...), where _tmp_dirs+= would be lost.
@@ -102,6 +102,18 @@ test_config_file_sets_model_and_env_wins() {
   assert_file_contains "$d/pi.args" "zai/from-file"
   MGKIT_PANEL_CONFIG="$d/panel.conf" MGKIT_PANEL_PI_MODEL=zai/from-env panel "$d" run --driver claude --prompt-file "$d/prompt.md" --out-dir "$d/out2" --repo "$d"
   assert_file_contains "$d/pi.args" "zai/from-env"
+}
+
+test_codex_effort_is_passed_and_listed() {
+  local d; d="$(new_stubs codex)"
+  printf 'MGKIT_PANEL_CODEX_MODEL=gpt-test\nMGKIT_PANEL_CODEX_EFFORT=low\n' >"$d/panel.conf"
+  MGKIT_PANEL_CONFIG="$d/panel.conf" panel "$d" seats --driver claude
+  assert_contains $'codex\tavailable\tgpt-test, effort: low'
+  MGKIT_PANEL_CONFIG="$d/panel.conf" panel "$d" run --driver claude --prompt-file "$d/prompt.md" --out-dir "$d/out" --repo "$d"
+  assert_status 0
+  assert_file_contains "$d/codex.args" "model_reasoning_effort=low"
+  panel "$d" run --driver claude --prompt-file "$d/prompt.md" --out-dir "$d/out2" --repo "$d"
+  ! grep -q model_reasoning_effort "$d/codex.args" || fail "effort passed without config"
 }
 
 test_config_file_is_never_executed() {

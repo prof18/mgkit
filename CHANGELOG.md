@@ -4,6 +4,10 @@ All notable changes to mgkit. Versions stay 0.0.x until the toolkit is declared 
 
 ## [Unreleased]
 
+### Added
+
+- `MGKIT_PANEL_CODEX_EFFORT` in `panel.conf` sets the Codex review seat's reasoning effort (`-c model_reasoning_effort=…`), which `--ignore-user-config` otherwise drops; `panel.sh seats` shows it next to the model.
+
 ## [0.0.14] - 2026-11-21
 
 ### Added

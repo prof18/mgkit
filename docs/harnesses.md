@@ -205,7 +205,7 @@ In `$(mktemp -d)`: `pi install -l <root>` writes only `./.pi/settings.json`; `pi
 | Seat | Command |
 |---|---|
 | claude | `claude -p --permission-mode plan --tools Read,Grep,Glob --strict-mcp-config --no-session-persistence [--model M]` |
-| codex | `codex exec -s read-only --ephemeral --ignore-user-config --disable apps --skip-git-repo-check -o <out>/codex.md [-m M] -` |
+| codex | `codex exec -s read-only --ephemeral --ignore-user-config --disable apps --skip-git-repo-check -o <out>/codex.md [-m M] [-c model_reasoning_effort=E] -` |
 | pi | `pi -p --tools read,grep,find,ls --no-extensions --no-skills --no-session --no-approve --offline [--model M] [-e EXT …]`; on failure, once more with the fallback model |
 
 The seats need network access, and they write to the panel directory in the session scratch. A driver running in a sandbox that blocks either must run the script outside the sandbox, with the user's approval. Difftray 0.0.16's `feedback submit` takes `actor {name, runId}` per batch, which is how each seat gets its own author.

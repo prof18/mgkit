@@ -14,6 +14,7 @@ A panel puts other agent CLIs next to you on the same review. You are the **driv
   | `MGKIT_PANEL_SEATS` | Space-separated seats to consider | `claude codex pi` |
   | `MGKIT_PANEL_CLAUDE_MODEL` | `--model` for the claude seat | CLI default |
   | `MGKIT_PANEL_CODEX_MODEL` | `-m` for the codex seat | CLI default |
+  | `MGKIT_PANEL_CODEX_EFFORT` | Reasoning effort for the codex seat, passed as `-c model_reasoning_effort=<value>`, e.g. `low` | CLI default |
   | `MGKIT_PANEL_PI_MODEL` | `--model` for the pi seat, e.g. `zai/glm-5.3` | CLI default |
   | `MGKIT_PANEL_PI_FALLBACK_MODEL` | Model for one retry when the pi seat fails for any reason (rate limit, quota, auth, or a stall that hits the timeout), e.g. `xai/grok-4.7`; the retry gets its own timeout | no retry |
   | `MGKIT_PANEL_PI_EXTENSIONS` | Space-separated pi extension paths to load, e.g. one that provides a model's provider; a leading `~/` is allowed | none: every extension stays off |
